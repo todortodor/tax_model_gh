@@ -19,7 +19,7 @@ def load_baseline(year):
     output = pd.read_csv (path+year+'/output_'+year+'.csv')
     va = pd.read_csv (path+year+'/VA_'+year+'.csv')
     co2_intensity = pd.read_csv(path+year+'/co2_intensity_prod_with_agri_ind_proc_fug_'+year+'.csv')
-    co2_prod = pd.read_csv(path+year+'/prod_CO2_with_agri_ind_proc_fug_'+year+'.csv')
+    co2_prod = pd.read_csv(path+year+'/prod_CO2_with_agri_agri_ind_proc_fug_'+year+'.csv')
     # labor = pd.read_csv('/Users/simonl/Documents/taff/datas/World bank/labor_force/labor.csv')
     labor = pd.read_csv('data/World bank/labor_force/labor.csv')
     
@@ -111,7 +111,7 @@ class sol:
         output = pd.read_csv (path+year+'/output_'+year+'.csv')
         va = pd.read_csv (path+year+'/VA_'+year+'.csv')
         co2_intensity = pd.read_csv(path+year+'/co2_intensity_prod_with_agri_ind_proc_fug_'+year+'.csv')
-        co2_prod = pd.read_csv(path+year+'/prod_CO2_with_agri_ind_proc_fug_'+year+'.csv')
+        co2_prod = pd.read_csv(path+year+'/prod_CO2_with_agri_agri_ind_proc_fug_'+year+'.csv')
         # labor = pd.read_csv('/Users/simonl/Documents/taff/datas/World bank/labor_force/labor.csv')
         labor = pd.read_csv('data/World bank/labor_force/labor.csv')
         
