@@ -27,19 +27,19 @@ print('Plotting GHG distribution by categories')
 
 years = [y for y in range(1995,2019)]
 
-emissions_baseline = [pd.read_csv('data/yearly_CSV_agg_treated/datas'+str(year)+'/prod_CO2_WLD_with_agri_agri_ind_proc_fug'+str(year)+'.csv').value.sum() for year in years]
+emissions_baseline = [pd.read_csv('data/yearly_CSV_agg_treated/datas'+str(year)+'/prod_CO2_WLD_with_agri_agri_ind_proc_fug_'+str(year)+'.csv').value.sum() for year in years]
 
-ghg = pd.read_csv('data/climate_watch/ghg_incl_forestryFAO.csv').set_index(['sector','year'])
+ghg = pd.read_csv('data/climate_watch/ghg_EDGAR_ip.csv').set_index(['sector','year'])
 
 datas = [ 'Electricity/Heat',
         'Manufacturing/Construction','Transportation','Agriculture','Forest fires',
-        'Other Fuel Combustion', 'Fugitive Emissions', 'Industrial Processes',
+         'Fugitive Emissions', 'Industrial Processes','Other Fuel Combustion',
         'Waste']
 
 labels = [ 'Energy (fuel)',
         'Industries (fuel)','Transports (fuel)','Agriculture (direct emissions) \nand related land-use change',
         'Forestry - Land change',  
-        'Other Fuel Combustion', 'Fugitive Emissions', 'Industrial Processes',
+         'Fugitive Emissions', 'Industrial Processes','Other Fuel Combustion',
         'Waste (direct emissions)']
 
 to_plot = [ghg.loc[data].value for data in datas]
@@ -60,7 +60,7 @@ stacks = ax.stackplot(years,
                 linewidth=0.5
              )
 
-hatches = ['','','','','//','//','//','//','//']
+hatches = ['','','','','','','','//','//']
 for stack, hatch in zip(stacks, hatches):
     stack.set_hatch(hatch)
 
@@ -87,7 +87,7 @@ print('Plotting GHG distribution by gas')
 
 carbon_prices = pd.read_csv('data/emissions_priced.csv')
 
-ghg = pd.read_csv('data/climate_watch/ghg_gases.csv').set_index('gas')
+ghg = pd.read_csv('data/climate_watch/ghg_EDGAR_gas.csv').set_index('gas')
 
 datas = ['CO2_data', 'CO2', 'CH4_data', 'CH4', 'N2O_data', 'N2O',   'F-Gas']
 
@@ -157,7 +157,7 @@ for sector in sector_map.index.to_list():
 
 years = [y for y in range(1995,2019)]
 
-emissions_baseline = [pd.read_csv('data/yearly_CSV_agg_treated/datas'+str(year)+'/prod_CO2_WLD_with_agri_agri_ind_proc_fug'+str(year)+'.csv').value.sum() for year in years]
+emissions_baseline = [pd.read_csv('data/yearly_CSV_agg_treated/datas'+str(year)+'/prod_CO2_WLD_with_agri_agri_ind_proc_fug_'+str(year)+'.csv').value.sum() for year in years]
 
 
 fig, ax = plt.subplots(2,2,figsize=(12,8),constrained_layout=True)
@@ -385,15 +385,15 @@ ax1.hlines(y=y_100,
 ax1.annotate('100',xy=(100,0), xytext=(-20,-20), textcoords='offset points',color=color)
 ax1.annotate(str(y_100.round(1)),
              xy=(0,y_100),
-             xytext=(-37,-5),
+             xytext=(-37,-10),
              textcoords='offset points',color=color)
 
 ax1.annotate(str(y_0.round(1)),
               xy=(0,y_0),
-              xytext=(-37,-8),
+              xytext=(-37,-6),
               textcoords='offset points',color=color)
 
-ax1.annotate("$100/Ton tax would reduce emissions by 26.7%",
+ax1.annotate("$100/Ton tax would reduce emissions by "+str(((y_0-y_100)*100/y_0).round(1))+"%",
             xy=(100, y_100), xycoords='data',
             xytext=(100+5, y_100+4),
             textcoords='data',
@@ -405,8 +405,8 @@ ax1.annotate("$100/Ton tax would reduce emissions by 26.7%",
 
 ax1.margins(y=0)
 
-ax1.set_yticks([0, 5, 10, 15, 20, 25, 30, 35])
-ax1.set_yticklabels(['0', '5', '10', '15', '20', '25', '', '35'])
+ax1.set_yticks([0, 5, 10, 15, 20, 25, 30, 35, 40, 45])
+ax1.set_yticklabels(['0', '5', '10', '15', '20', '25', '30', '35', '40', '45'])
 
 fig.tight_layout()
 
@@ -523,70 +523,28 @@ ax[0,0].annotate(str(y_100.round(0)),
 ax[0,0].set_ylim(0,np.array(emissions).max()/1e3+0.5)
 
 ax[0,0].set_yticks([0, 10, 20, 30, 40])
-ax[0,0].set_yticklabels(['0','10','20','','40'])
+ax[0,0].set_yticklabels(['0','10','20','30','40'])
 
 # Upper right - GDP
-# gdp_covid = np.array(gdp_new).max()*0.955
-# tax_covid = carb_cost_l[np.argmin(np.abs(np.array(gdp_new) - gdp_covid))]
-#
-# ax[0,1].plot(np.array(carb_cost_l)*1e6,np.array(gdp_new)/1e6,lw=4)
-# ax[0,1].set_xlabel('')
-# ax[0,1].tick_params(axis='x', which='both',      # both major and minor ticks are affected
-#     bottom=False,      # ticks along the bottom edge are off
-#     top=False,         # ticks along the top edge are off
-#     labelbottom=False)
-# ax[0,1].set_xlim(0,1000)
-# ax[0,1].hlines(y=gdp_covid/1e6,linestyle=":",xmin=0,xmax=tax_covid*1e6,lw=3)
-# ax[0,1].legend(['GDP (thousand billion dollars)','GDP drop due to covid (scaled)'])
-# # ax[0,1].vlines(x=e_max,ymax=(GDP+DISU).max(), ymin=0, color=color, linestyle=":",lw=3)
-#
-# y_100 = np.array(gdp_new)[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]/1e6
-# # y_0 = runs_low_carb_cost.iloc[0].emissions
-#
-# ax[0,1].vlines(x=100,
-#             ymin=np.array(gdp_new).min()/1e6,
-#             ymax=y_100,
-#             lw=3,
-#             ls = '--',
-#             color = color)
-#
-# ax[0,1].hlines(y=y_100,
-#             xmin=0,
-#             xmax=100,
-#             lw=3,
-#             ls = '--',
-#             color = color)
-#
-# ax[0,1].margins(y=0)
-#
-# ax[0,1].annotate(str(y_100.round(1)),
-#              xy=(0,y_100),
-#              xytext=(-37,-5),
-#              textcoords='offset points',color=color)
-#
-# ax[0,1].set_ylim(np.array(gdp_new).min()/1e6,np.array(gdp_new).max()/1e6+0.5)
-#
-# ax[0,1].set_yticks([79,80,81,82,83])
-# ax[0,1].set_yticklabels(['79','80','81','','83'])
+gdp_covid = np.array(gdp_new).max()*0.955
+tax_covid = carb_cost_l[np.argmin(np.abs(np.array(gdp_new) - gdp_covid))]
 
-gdp_covid = 0.955
-tax_covid = carb_cost_l[np.argmin(np.abs(np.array(gdp_new)/gdp_new[0] - gdp_covid))]
-
-ax[0,1].plot(np.array(carb_cost_l)*1e6,np.array(gdp_new)/gdp_new[0],lw=4)
+ax[0,1].plot(np.array(carb_cost_l)*1e6,np.array(gdp_new)/1e6,lw=4)
 ax[0,1].set_xlabel('')
 ax[0,1].tick_params(axis='x', which='both',      # both major and minor ticks are affected
     bottom=False,      # ticks along the bottom edge are off
     top=False,         # ticks along the top edge are off
     labelbottom=False)
 ax[0,1].set_xlim(0,1000)
-ax[0,1].hlines(y=gdp_covid,linestyle=":",xmin=0,xmax=tax_covid*1e6,lw=3)
-ax[0,1].legend(['GDP','GDP drop due to covid'])
+ax[0,1].hlines(y=gdp_covid/1e6,linestyle=":",xmin=0,xmax=tax_covid*1e6,lw=3)
+ax[0,1].legend(['GDP (thousand billion dollars)','GDP drop due to covid (scaled)'])
+# ax[0,1].vlines(x=e_max,ymax=(GDP+DISU).max(), ymin=0, color=color, linestyle=":",lw=3)
 
-y_100 = (np.array(gdp_new)/gdp_new[0])[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]
-y_100 = (np.array(gdp_new))[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]
+y_100 = np.array(gdp_new)[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]/1e6
+# y_0 = runs_low_carb_cost.iloc[0].emissions
 
 ax[0,1].vlines(x=100,
-            ymin=(np.array(gdp_new)/gdp_new[0]).min(),
+            ymin=np.array(gdp_new).min()/1e6,
             ymax=y_100,
             lw=3,
             ls = '--',
@@ -601,17 +559,59 @@ ax[0,1].hlines(y=y_100,
 
 ax[0,1].margins(y=0)
 
-ax[0,1].annotate(str(y_100.round(3)),
-             xy=(0,y_100),
-             xytext=(-50,-5),
-             textcoords='offset points',color=color)
+ax[0,1].annotate(str(y_100.round(1)),
+              xy=(0,y_100),
+              xytext=(-37,-5),
+              textcoords='offset points',color=color)
 
-# ax[0,1].annotate(str(gdp_covid),
-#              xy=(0,gdp_covid),
+ax[0,1].set_ylim(np.array(gdp_new).min()/1e6,np.array(gdp_new).max()/1e6+0.5)
+
+# ax[0,1].set_yticks([79,80,81,82,83])
+# ax[0,1].set_yticklabels(['79','80','81','','83'])
+
+# gdp_covid = 0.955
+# tax_covid = carb_cost_l[np.argmin(np.abs(np.array(gdp_new)/gdp_new[0] - gdp_covid))]
+
+# ax[0,1].plot(np.array(carb_cost_l)*1e6,np.array(gdp_new)/gdp_new[0],lw=4)
+# ax[0,1].set_xlabel('')
+# ax[0,1].tick_params(axis='x', which='both',      # both major and minor ticks are affected
+#     bottom=False,      # ticks along the bottom edge are off
+#     top=False,         # ticks along the top edge are off
+#     labelbottom=False)
+# ax[0,1].set_xlim(0,1000)
+# ax[0,1].hlines(y=gdp_covid,linestyle=":",xmin=0,xmax=tax_covid*1e6,lw=3)
+# ax[0,1].legend(['GDP','GDP drop due to covid'])
+
+# y_100 = (np.array(gdp_new)/gdp_new[0])[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]
+# y_100 = (np.array(gdp_new))[np.argmin(np.abs(np.array(carb_cost_l)*1e6-100))]
+
+# ax[0,1].vlines(x=100,
+#             ymin=(np.array(gdp_new)/gdp_new[0]).min(),
+#             ymax=y_100,
+#             lw=3,
+#             ls = '--',
+#             color = color)
+
+# ax[0,1].hlines(y=y_100,
+#             xmin=0,
+#             xmax=100,
+#             lw=3,
+#             ls = '--',
+#             color = color)
+
+# ax[0,1].margins(y=0)
+
+# ax[0,1].annotate(str(y_100.round(3)),
+#              xy=(0,y_100),
 #              xytext=(-50,-5),
-#              textcoords='offset points', color='b', fontsize=15)
+#              textcoords='offset points',color=color)
 
-ax[0,1].set_ylim((np.array(gdp_new)/gdp_new[0]).min(),(np.array(gdp_new)/gdp_new[0]).max()+0.005)
+# # ax[0,1].annotate(str(gdp_covid),
+# #              xy=(0,gdp_covid),
+# #              xytext=(-50,-5),
+# #              textcoords='offset points', color='b', fontsize=15)
+
+# ax[0,1].set_ylim((np.array(gdp_new)/gdp_new[0]).min(),(np.array(gdp_new)/gdp_new[0]).max()+0.005)
 
 # Bottom left - Welfare
 ax[1,0].plot(np.array(carb_cost_l)*1e6,utility,lw=4,color='r')
@@ -729,7 +729,7 @@ color3 = sns.color_palette()[4]
 
 ax.tick_params(axis='x', which='major', labelsize=labelsize,color='grey')
 ax.tick_params(axis='y', which='major', labelsize=labelsize,labelcolor=color1,color='grey')
-ax.set_xlim(40, 10)
+ax.set_xlim(emissions[0], emissions.iloc[-1])
 ax.set_ylim(bottom_left,bottom_left+height)
 ax2.tick_params(axis='x', which='major', labelsize=labelsize,color='grey')
 ax2.tick_params(axis='y', which='major', labelsize=labelsize,labelcolor=color2,color='grey')
@@ -746,7 +746,7 @@ DISU = DISU #- DISU.max()
 
 g_max = (GDP+DISU).max()
 e_max = emissions[np.argmax(GDP+DISU)]
-ax.hlines(y=(GDP+DISU).max(), xmin=e_max,xmax=30, linestyle=":",lw=4,color=color3)
+ax.hlines(y=(GDP+DISU).max(), xmax=e_max,xmin=emissions[0], linestyle=":",lw=4,color=color3)
 ax.vlines(x=e_max,ymax=(GDP+DISU).max(), ymin=0, linestyle=":",lw=4,color=color3)
 
 # ax.set_xticks([10.0,12.5,15.0,17.5,20,22.5,25.0,27.5])
@@ -792,37 +792,52 @@ print('Plotting consumer price index changes for multiple countries')
 
 countries = ['DEU','CHN','USA','CHE']#,'FRA','CHE','CZE']
 
+# countries = country_list
+countries_to_label = ['DEU','CHN','USA','CHE']
+# countries_to_label = country_list
+
 infl = {}
 infl['DEU'] = 5.1
 infl['CHN'] = 0.9
 infl['USA'] = 7.9
 infl['CHE'] = 2.2
+# infl['AUS'] = 5 #not true, was just to plot
 
 inf_l = [5.1,0.9,7.9,2.2]
 carb_tax_eq_l = []
+plot_inflation = True
 
-for i,country in enumerate(countries):
-    carb_tax_eq_l.append(carb_cost_l[np.argmin(np.abs((np.array(price_index_l[country])-1)*100-infl[country]))])
+if plot_inflation:
+    for i,country in enumerate(countries):
+        carb_tax_eq_l.append(carb_cost_l[np.argmin(np.abs((np.array(price_index_l[country])-1)*100-infl[country]))])
 
 fig, ax1 = plt.subplots(figsize=(12,8))
 color = 'tab:blue'
 
 ax1.set_xlabel('Carbon tax (dollar / ton of CO2)',size = 30)
 ax1.set_xlim(0,1000)
-# ax1.set_ylim(13,13.4)
+ax1.set_ylim(0,25)
 ax1.tick_params(axis='x', labelsize = 20)
 
 ax1.set_ylabel('Consumer price index change (%)',size = 28)
 for i,country in enumerate(countries):
-    color=sns.color_palette()[i]
-    ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_l[country])-1)*100,lw=4,label=country,color=color)
+    color=sns.color_palette()[i%10]
+    if country in countries_to_label:
+        ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_l[country])-1)*100,lw=2,label=country,color=color)
+    # else:
+    #     ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_l[country])-1)*100,lw=2,color=color)
     # carb_tax_eq = carb_cost_l[np.argmin(np.abs((np.array(price_index_l[country])-1)*100-infl[country]))]
     # ax1.scatter(carb_tax_eq*1e6,infl[country],lw=2,zorder=10)
-ax1.scatter(np.array(carb_tax_eq_l)*1e6,np.array(inf_l),lw=4,zorder=10,c=sns.color_palette()[0:4],label='Inflation Feb22')
+if plot_inflation:
+    ax1.scatter(np.array(carb_tax_eq_l)*1e6,np.array(inf_l),lw=4,zorder=10,c=sns.color_palette()[0:len(countries)],label='Inflation Feb22')
 ax1.legend()
-leg = ax1.get_legend()
-leg.legendHandles[4].set_color('grey')
+ax1.set_xticks([x for x in np.linspace(0,1000,11)])
+ax1.set_yticks([y for y in np.linspace(0,25,11)])
 
+if plot_inflation:
+    leg = ax1.get_legend()
+    leg.legendHandles[len(countries)].set_color('grey')
+labelLines(plt.gca().get_lines(),zorder=2.5,fontsize=20)  
 ax1.tick_params(axis='y', labelsize = 20)
 
 plt.tight_layout()
@@ -935,7 +950,7 @@ ax.legend(handles=handles,fontsize=20)
 # ax.legend(group_labels_sorted)
 
 plt.title('(Tax = $100/Ton of CO2)',size = 25,color=color)
-plt.suptitle('Sectoral consumer price change in Switzerland (%)',size = 30,y=0.96)
+plt.suptitle('Sectoral consumer price change in '+country+' (%)',size = 30,y=0.96)
 
 plt.tight_layout()
 
@@ -990,7 +1005,7 @@ country_index = country_list.index(country)
 ax.annotate(country + ' - ' + sector,
             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
             xycoords='data',
-            xytext=(-150, -100),
+            xytext=(-250, 0),
             textcoords='offset points',
             va='center',
             arrowprops=dict(arrowstyle="->",
@@ -1026,7 +1041,7 @@ country_index = country_list.index(country)
 ax.annotate(country + ' - ' + sector,
             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
             xycoords='data',
-            xytext=(120, 60),
+            xytext=(20, 80),
             textcoords='offset points',
             va='center',
             arrowprops=dict(arrowstyle="->",
@@ -1080,7 +1095,7 @@ country_index = country_list.index(country)
 ax.annotate(country + ' - ' + sector,
             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
             xycoords='data',
-            xytext=(100, -15),
+            xytext=(100, -35),
             textcoords='offset points',
             va='center',
             arrowprops=dict(arrowstyle="->",
@@ -1107,7 +1122,7 @@ data = pd.DataFrame(data = q_hat_sol_percent.ravel(),
                     columns=['value'])
 data = data.reset_index().merge(sector_map.reset_index(),how='left',left_on='sector',right_on='ind_code').set_index(['country','sector']).drop('ind_code',axis=1)
 data['co2_intensity'] = sh['co2_intensity_np'].ravel()
-data['output'] = sh['co2_intensity_np'].ravel()
+data['output'] = sh['output_np'].ravel()
 data=data.sort_values('group_code')
 
 sector_list_full = []
@@ -1135,6 +1150,7 @@ palette = [sns.color_palette('bright')[i] for i in [2,4,0,3,1,7]]
 palette[0] = sns.color_palette()[2]
 palette[1] = sns.color_palette("hls", 8)[-2]
 for data_no_z_i in [data_no_z_1,data_no_z_2] :
+# for data_no_z_i in [data_no_z] :
     plot2 = sns.kdeplot(data=data_no_z_i,
                 x='co2_intensity',
                 y="value",
@@ -1149,9 +1165,9 @@ for data_no_z_i in [data_no_z_1,data_no_z_2] :
                 legend=False,
                 levels = 2,
                 palette = palette,
-                common_norm = False,
+                common_norm = True,
                 # shade=True,
-                thresh = 0.25,
+                thresh = 0.2,
                 # fill = False,
                 # alpha=0.6,
                 # hue_order = data.group_label.drop_duplicates().to_list()[::-1],
@@ -1165,7 +1181,9 @@ ax.set_ylabel('Production changes (%)',
                 fontsize=30
                 )
 ax.set_xscale('log')
-ax.set_ylim(-100,+37.5)
+# ax.set_ylim(-100,+37.5)
+ax.set_ylim(-80, +40)
+
 # ax.set_xlim(0.5,20000)
 ax.set_xlim(data_no_z.co2_intensity.min(),3e4)
 ax.margins(x=0)
@@ -1507,7 +1525,7 @@ leg = ax.legend(fontsize=20,loc='lower right')
 # leg.legendHandles[1].set_color('grey')
 
 ax.grid(axis='x')
-ax.set_ylim(-1.85,0.25)
+# ax.set_ylim(-1.85,0.25)
 
 ax.bar_label(ax.containers[1],
              labels=country_dist_df.index.get_level_values(0),
@@ -1582,7 +1600,7 @@ leg = ax.legend(fontsize=20,loc='lower right')
 # leg.legendHandles[1].set_color('grey')
 
 ax.grid(axis='x')
-ax.set_ylim(-20,5)
+# ax.set_ylim(-20,5)
 
 ax.bar_label(ax.containers[1],
              labels=country_dist_df.index.get_level_values(0),
@@ -1873,7 +1891,7 @@ leg = ax.legend(fontsize=20,loc='lower right')
 # leg.legendHandles[1].set_color('grey')
 
 ax.grid(axis='x')
-ax.set_ylim(-0.62,0.52)
+# ax.set_ylim(-0.62,0.52)
 
 ax.bar_label(ax.containers[0],
              labels=country_dist_df.index.get_level_values(0),
@@ -1945,13 +1963,13 @@ sns.kdeplot(data=emissions,
                 # height=10,
                 # ratio=5,
                 # bw_adjust=0.7,
-                weights = 'value',
+                # weights = 'value',
                 # legend=False,
                 levels = 2,
                 palette = palette,
                 # common_norm = False,
                 shade=True,
-                thresh = 0.15,
+                thresh = 0.1,
                 # dropna=True,
                 # fill = False,
                 # alpha=0.6,
@@ -2008,7 +2026,7 @@ ax.set_ylabel('Emission reduction (Mio. T)', fontsize = 20)
 #                 # height=10,
 #                 # ratio=5,
 #                 # bw_adjust=0.7,
-#                 weights = 'value',
+#                 # weights = 'value',
 #                 # legend=False,
 #                 levels = 2,
 #                 palette = palette,
@@ -2105,34 +2123,34 @@ colors[country_list.index('RUS')] = (149/255, 143/255, 121/255)
 
 fig, ax = plt.subplots(figsize=(12,8),constrained_layout = True)
 
-# ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50,c = colors)     # For kernel density
-ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50)
+ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50,c = colors)     # For kernel density
+# ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50)
 
 ax.set_xlabel('GDP per workforce (Thousands $)', fontsize = 20)
 ax.set_ylabel('Welfare change (%)', fontsize = 20)
 
-# sns.kdeplot(data=gdp,
-#                 x='per_capita',
-#                 y="utility_percent_change",
-#                 hue = 'Continent',
-#                 fill = True,
-#                 alpha = 0.25,
-#                 # height=10,
-#                 # ratio=5,
-#                 # bw_adjust=0.7,
-#                 weights = 'labor',
-#                 # legend=False,
-#                 levels = 2,
-#                 palette = palette,
-#                 # common_norm = False,
-#                 shade=True,
-#                 thresh = 0.12,
-#                 # dropna=True,
-#                 # fill = False,
-#                 # alpha=0.6,
-#                 # hue_order = data.group_label.drop_duplicates().to_list()[::-1],
-#                 ax = ax
-#                 )
+sns.kdeplot(data=gdp,
+                x='per_capita',
+                y="utility_percent_change",
+                hue = 'Continent',
+                fill = True,
+                alpha = 0.25,
+                # height=10,
+                # ratio=5,
+                # bw_adjust=0.7,
+                # weights = 'labor',
+                # legend=False,
+                levels = 2,
+                palette = palette,
+                # common_norm = False,
+                shade=True,
+                thresh = 0.12,
+                # dropna=True,
+                # fill = False,
+                # alpha=0.6,
+                # hue_order = data.group_label.drop_duplicates().to_list()[::-1],
+                ax = ax
+                )
 
 # sns.move_legend(ax, "lower right")
 
@@ -2141,8 +2159,8 @@ ax.set_xlim(0,175)
 ax.set_ylim(-7,1.5)
 
 
-# texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15, c = colors[i]) for i,country in enumerate(country_list)]     # For kernel density
-texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15) for i,country in enumerate(country_list)]
+texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15, c = colors[i]) for i,country in enumerate(country_list)]     # For kernel density
+# texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15) for i,country in enumerate(country_list)]
 
 # adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
 adjust_text(texts, precision=0.001,
@@ -2168,15 +2186,19 @@ gdp['price_index'] = price_index
 gdp = gdp.join(labor_year).rename(columns={year:'labor'})
 gdp['per_capita'] = (gdp.value / gdp.labor)
 
+gdp['change']= (gdp.new/gdp.value)
+
 gdp['change_real'] = ((gdp.new/gdp.value)/(gdp.price_index))
 
 gdp['new_adjusted'] = gdp['change_real']*gdp['value']
 
-gdp_mean_change = gdp['new_adjusted'].sum()/gdp['value'].sum()
+# gdp_mean_change = gdp['new_adjusted'].sum()/gdp['value'].sum()
+gdp_mean_change = gdp['new'].sum()/gdp['value'].sum()
 
 gdp['new_if_average_change_adjusted']  = gdp['value'] * gdp_mean_change
 
-gdp['contribution'] = gdp['new_adjusted'] - gdp['new_if_average_change_adjusted']
+# gdp['contribution'] = gdp['new_adjusted'] - gdp['new_if_average_change_adjusted']
+gdp['contribution'] = gdp['new'] - gdp['new_if_average_change_adjusted']
 
 gdp['wage_change_for_equality'] = -(gdp['contribution'] / gdp.labor)*1e6
 
@@ -2204,8 +2226,8 @@ ax1.scatter(gdp.index.get_level_values(0),gdp['relative_change'], color=sns.colo
 
 ax1.grid(visible=False)
 ax.margins(x=0.01)
-ax.set_ylim(-6000,6000)
-ax1.set_ylim(-6,6)
+# ax.set_ylim(-10000,8000)
+# ax1.set_ylim(-10,8)
 
 ax1.tick_params(axis = 'y', colors=sns.color_palette()[1] , labelsize = 20 )
 ax1.set_ylabel('Contribution per worker (% of wage)', color = sns.color_palette()[1] , fontsize = 30)
@@ -2213,6 +2235,31 @@ ax1.set_ylabel('Contribution per worker (% of wage)', color = sns.color_palette(
 
 plt.show()
 
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
+
+ax.scatter(gdp.change,gdp.price_index)
+ax.set_ylabel('CPI change' , fontsize = 20)
+ax.set_xlabel('GDP change' , fontsize = 20)
+
+
+annot_list = gdp.sort_values('wage_change_for_equality').index.to_list()[:5] \
+    +gdp.sort_values('wage_change_for_equality',ascending=False).index.to_list()[:2]
+# for cou in gdp.sort_values('wage_change_for_equality',ascending=False).index.to_list()[:5]
+annot_list.append('RUS')
+annot_list.append('BRA')
+annot_list.append('ZAF')
+annot_list.append('CHE')
+
+for country in annot_list:
+    ax.annotate(country,
+                xy=(gdp.change.loc[country],gdp.price_index.loc[country]),
+                xycoords='data',
+                xytext=(0, 0),
+                textcoords='offset points',
+                va='center'
+                )
+
+plt.show()
 
 #%% Computing trade data for connectivities
 
@@ -2359,12 +2406,12 @@ ax.set_ylabel('Connectivity to the global trade, evolution prediction',fontsize 
 # ax.legend(loc='lower right')
 
 texts = [plt.text(own_trade['co2_intensity'].loc[country],  own_trade['connectivity_diff'].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
-# adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
-adjust_text(texts, precision=0.001,
-        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-        force_text=(0.01, 0.25), force_points=(0.01, 0.25),
-        arrowprops=dict(arrowstyle='-', color='k'#, alpha=.5
-                        ))
+adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
+# adjust_text(texts, precision=0.001,
+#         expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+#         force_text=(0.01, 0.25), force_points=(0.01, 0.25),
+#         arrowprops=dict(arrowstyle='-', color='k'#, alpha=.5
+#                         ))
 
 plt.show()
 
@@ -2436,12 +2483,12 @@ ax.set_ylabel('Connectivity to the global trade, evolution prediction',fontsize 
 # ax.legend(loc='lower right')
 
 texts = [plt.text(own_trade['connectivity'].loc[country],  own_trade['connectivity_diff'].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
-# adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
-adjust_text(texts, precision=0.001,
-        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-        force_text=(0.01, 0.25), force_points=(0.01, 0.25),
-        arrowprops=dict(arrowstyle='-', color='k'#, alpha=.5
-                        ))
+adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
+# adjust_text(texts, precision=0.001,
+#         expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+#         force_text=(0.01, 0.25), force_points=(0.01, 0.25),
+#         arrowprops=dict(arrowstyle='-', color='k'#, alpha=.5
+#                         ))
 
 plt.show()
 
@@ -2702,6 +2749,7 @@ print('Plotting emissions reductions every year with fixed carbon tax if chosen'
 
 if fixed_carb_tax:
     sol_all = sol_all_adjusted
+    
     
     years = list(sorted(sol_all.keys()))
     
@@ -3071,7 +3119,7 @@ plt.show()
 
 #%% 4 subplots of carbon intensities
 
-highlight = 'CHN'
+highlight = 'AUS'
 nbr_country = 7
 print('Plotting summary of carbon intensities for '+str(nbr_country)+' countries and highlighting '+highlight)
 
@@ -3085,6 +3133,8 @@ years = [y for y in range(1995,2019)]
 # country_country = [traded[y].groupby(level=[0]).sum() for y in years]
 
 biggest_countries = traded[y].groupby(level=[0]).sum().sort_values('value',ascending=False).index.get_level_values(0).to_list()[:nbr_country]
+if highlight not in biggest_countries:
+    biggest_countries.append(highlight)
 biggest_countries[0],biggest_countries[3] = biggest_countries[3],biggest_countries[0]
 
 exports_share_country = {}
@@ -3175,7 +3225,7 @@ ax[1,0].set_title('Comparative carbon intensity of production\nsector '+sector_m
 
 labelLines(ax[1,0].get_lines(),zorder=2.5,fontsize=15)   
 
-sector = '35'
+sector = '24'
 
 country_intensities = pd.concat(
     [pd.read_csv('data/yearly_CSV_agg_treated/datas'+str(y)+'/prod_CO2_with_agri_agri_ind_proc_fug_'+str(y)+'.csv').set_index(['country','sector']).xs(sector,level=1) \
