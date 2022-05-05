@@ -12,7 +12,7 @@ from adjustText import adjust_text
 from tqdm import tqdm
 from labellines import labelLines
 # import treatment_funcs as t
-import treatment_funcs_agri as t
+import treatment_funcs_agri_ind_fe as t
 
 #%% Set seaborn parameters
 sns.set()
@@ -26,7 +26,7 @@ print('Setting parameters for run')
 
 y = 2018
 year = str(y)
-dir_num = 6
+dir_num = 8
 path = 'results/'+year+'_'+str(dir_num)
 carb_cost = 1e-4
 
@@ -64,6 +64,7 @@ sector_list_full = []
 for sector in sector_list:
     sector_list_full.append(sector_map.loc['D' + sector].industry)
 
+#%% Total spending for effective tax rate
 # Compute aggregate spending, and spending weighted by carbon intensity
 m_df = sol_all[y].iot.groupby(level=[0,1,2]).sum().new
 s_df = pd.merge(
@@ -150,8 +151,8 @@ gdp['per_capita'] = (gdp.value / gdp.labor)
 
 gdp['change_real'] = ((gdp.new/gdp.value)/(gdp.price_index))
 
-gdp['new_adjusted'] = gdp['change_real']*gdp['value']
-# gdp['new_adjusted'] = gdp['new']
+# gdp['new_adjusted'] = gdp['change_real']*gdp['value']
+gdp['new_adjusted'] = gdp['new']
 
 gdp_mean_change = gdp['new_adjusted'].sum()/gdp['value'].sum()
 
