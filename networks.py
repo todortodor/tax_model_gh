@@ -31,7 +31,7 @@ sns.set_style("whitegrid")
 # carb_cost = 1e-4
 
 sol_all = {}
-dir_num = 6
+dir_num = 8
 carb_cost = 1e-4
 # carb_cost = {}
 
@@ -166,7 +166,7 @@ c_c.loc[c_c.row_country == 'NZL',['longitude']] = 154
 
 #%% write csv
 
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test2.csv')
+# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
 
 
 #%% look for a specific flow
@@ -286,7 +286,7 @@ c_c['labels-edge'] = ((c_c['hat']-1)*100).round(1)
 
 #%% write csv
 
-# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/regions3.csv')
+# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
 
 
 #%% by regions with sectors
@@ -464,7 +464,7 @@ test = c_c.copy()
 # c_c.loc[c_c.row_country == 'NZL',['longitude']] = 154
 
 c_c = c_c.reset_index().T.reset_index().T
-c_c.iloc[0] = c_c.iloc[0]+' , '+test.iloc[1]
+c_c.iloc[0] = c_c.iloc[0]+' , '+c_c.iloc[1]
 c_c.drop('Quantity',inplace = True)
 
 
@@ -473,7 +473,7 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors_and_self_trade8.csv')
+c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
 
 #%%  by country with sectors
 
@@ -645,4 +645,4 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/countries_with_sectors_2018.csv')
+c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
