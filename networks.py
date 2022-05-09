@@ -35,7 +35,9 @@ dir_num = 8
 carb_cost = 1e-4
 # carb_cost = {}
 
-if dir_num>5:
+if dir_num>7:
+    import treatment_funcs_agri_ind_fe as t
+elif dir_num>5:
     import treatment_funcs_agri as t
 else:
     import treatment_funcs as t
