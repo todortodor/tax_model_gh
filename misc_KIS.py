@@ -124,7 +124,7 @@ ax.bar_label(ax.containers[0],
               padding=2,
               zorder=10)
 
-ax.set_ylim(0,9.5)
+ax.set_ylim(0,10)
 plt.show()
 
 #%%  Effective transfers (just renaming wage GDP-per-capita for clarity)
@@ -186,8 +186,8 @@ ax1.scatter(gdp.index.get_level_values(0),gdp['relative_change'], color=sns.colo
 
 ax1.grid(visible=False)
 ax.margins(x=0.01)
-ax.set_ylim(-6000,6000)
-ax1.set_ylim(-6,6)
+ax.set_ylim(-6500,6500)
+ax1.set_ylim(-6.5,6.5)
 
 ax1.tick_params(axis = 'y', colors=sns.color_palette()[1] , labelsize = 20 )
 ax1.set_ylabel('Contribution per worker (% of GDPpc)', color = sns.color_palette()[1] , fontsize = 30)
@@ -203,3 +203,30 @@ negL_total = gdp.loc[gdp['contribution']<=0, 'labor'].sum()
 
 print('Positive transfer per capita:', pos_total/posL_total*1e6)
 print('Negative transfer per capita:', neg_total/negL_total*1e6)
+
+#%% Aggregate price index change at 100$ tax (weighted average)
+price_agg_change = (price_index * sh['cons_tot_np'] / sh['cons_tot_np'].sum()).sum()
+print('Aggregate price index change - Weighted average:',
+      price_agg_change)
+
+# %% Plot 3 stat: Complete reallocation (across both origins and sectors)
+calc = output
+temp = calc.new - calc.value
+change = temp.sum()
+realloc_pos = np.abs(temp[temp > 0].sum())
+realloc_neg = np.abs(temp[temp < 0].sum())
+total_value = calc.value.sum()
+total_new = calc.new.sum()
+realloc = np.minimum(realloc_pos, realloc_neg)
+realloc_percent = (realloc / total_value)*100
+change_percent = (change / total_value)*100
+total_change = realloc_percent + change_percent
+
+print(f'Overall {round(realloc_percent, 2)} percent of gross output would be reallocated across countries and sectors for a net reduction of output of {round(change_percent, 2)}%')
+
+#%% Within country sectoral reallocation - get examples
+# Construct dataframe
+output = sol_all[y].output
+
+output['diff'] = output['new'] - output['value']
+output.reset_index(inplace=True)
