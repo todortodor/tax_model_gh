@@ -103,7 +103,7 @@ c_co2_intensity = sol_all[y].co2_prod.groupby(level=0).sum().value / sol_all[y].
 c_co2_intensity = pd.DataFrame(c_co2_intensity).reset_index()
 c_co2_intensity.columns = ['row_country','co2_intensity']
 
-world = pd.read_csv('/Users/simonl/Documents/taff/datas/country_coord/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
+world = pd.read_csv('data/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
 world.columns = ['country','latitude','longitude']
 for column in world.columns: 
     world[column] = world[column].str.replace('"','')
@@ -116,7 +116,7 @@ world['latitude'] = pd.to_numeric(world['latitude'])
 world['longitude'] = pd.to_numeric(world['longitude'])
 # world.set_index('country',inplace=True)
 
-country_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/country_continent.csv',sep=';')
+country_map = pd.read_csv('data/country_continent.csv',sep=';')
 
 country_map['region_1'] = country_map.region_1.str.split().apply(reversed).apply(' '.join)
 
@@ -186,7 +186,7 @@ specific_c_c['hat'] = specific_c_c['new'] / specific_c_c['value']
 # c_c = traded[y].groupby(level=[0,2]).sum().reset_index().copy()
 c_c = traded[y].reset_index()
 
-world = pd.read_csv('/Users/simonl/Documents/taff/datas/country_coord/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
+world = pd.read_csv('data/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
 world.columns = ['country','latitude','longitude']
 for column in world.columns: 
     world[column] = world[column].str.replace('"','')
@@ -199,7 +199,7 @@ world['latitude'] = pd.to_numeric(world['latitude'])
 world['longitude'] = pd.to_numeric(world['longitude'])
 # world.set_index('country',inplace=True)
 
-country_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/country_continent.csv',sep=';')
+country_map = pd.read_csv('data/country_continent.csv',sep=';')
 
 country_map['region_1'] = country_map.region_1.str.split().apply(reversed).apply(' '.join)
 
@@ -297,7 +297,7 @@ c_c['labels-edge'] = ((c_c['hat']-1)*100).round(1)
 # c_c = traded[y].groupby(level=[0,1,2]).sum().reset_index().copy()
 c_c = tot[y].groupby(level=[0,1,2]).sum().reset_index().copy()
 
-world = pd.read_csv('/Users/simonl/Documents/taff/datas/country_coord/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
+world = pd.read_csv('data/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
 world.columns = ['country','latitude','longitude']
 for column in world.columns: 
     world[column] = world[column].str.replace('"','')
@@ -310,12 +310,12 @@ world['latitude'] = pd.to_numeric(world['latitude'])
 world['longitude'] = pd.to_numeric(world['longitude'])
 # world.set_index('country',inplace=True)
 
-sector_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/industry_labels_after_agg_expl.csv',sep=';').set_index('ind_code')
+sector_map = pd.read_csv('data/industry_labels_after_agg_expl.csv',sep=';').set_index('ind_code')
 sector_list = sol_all[y].output.index.get_level_values(1).drop_duplicates().to_list()
 sector_map['row_sector'] = sector_list
 sector_map = sector_map.reset_index().set_index('row_sector')
 
-country_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/country_continent.csv',sep=';')
+country_map = pd.read_csv('data/country_continent.csv',sep=';')
 
 country_map['region_1'] = country_map.region_1.str.split().apply(reversed).apply(' '.join)
 
@@ -475,13 +475,13 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
+# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
 
 #%%  by country with sectors
 
 c_c = traded[y].groupby(level=[0,1,2]).sum().reset_index().copy()
 
-world = pd.read_csv('/Users/simonl/Documents/taff/datas/country_coord/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
+world = pd.read_csv('data/countries_codes_and_coordinates.csv')[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
 world.columns = ['country','latitude','longitude']
 for column in world.columns: 
     world[column] = world[column].str.replace('"','')
@@ -494,12 +494,12 @@ world['latitude'] = pd.to_numeric(world['latitude'])
 world['longitude'] = pd.to_numeric(world['longitude'])
 # world.set_index('country',inplace=True)
 
-sector_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/industry_labels_after_agg_expl.csv',sep=';').set_index('ind_code')
+sector_map = pd.read_csv('data/industry_labels_after_agg_expl.csv',sep=';').set_index('ind_code')
 sector_list = sol_all[y].output.index.get_level_values(1).drop_duplicates().to_list()
 sector_map['row_sector'] = sector_list
 sector_map = sector_map.reset_index().set_index('row_sector')
 
-country_map = pd.read_csv('/Users/simonl/Documents/taff/datas/OECD/country_continent.csv',sep=';')
+country_map = pd.read_csv('data/country_continent.csv',sep=';')
 
 country_map['region_1'] = country_map.region_1.str.split().apply(reversed).apply(' '.join)
 
@@ -647,4 +647,4 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
+# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
