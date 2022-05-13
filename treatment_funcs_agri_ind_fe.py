@@ -441,7 +441,7 @@ def sol_from_loaded_data(carb_cost, run, cons, iot, output, va, co2_prod, sh):
                 sh['co2_intensity_np'] ,
                 sh['share_cons_o_np'])
         cons_hat_unit = s.cons_eq_unit( p_hat_sol , *args2)
-        
+
         iot_new = np.einsum('it,js,itjs,itjs -> itjs', p_hat_sol, E_hat_sol , iot_hat_unit , sh['iot_np'])
         
         va_new = E_hat_sol * sh['va_np']
@@ -465,7 +465,17 @@ def sol_from_loaded_data(carb_cost, run, cons, iot, output, va, co2_prod, sh):
         one_over_K = np.divide(1,K) 
         
         I_hat_sol = (np.einsum('js,js -> j' , E_hat_sol,A)+ sh['deficit_np'])*one_over_K                                                               
-                                                                           
+
+        cons_hat_sol = np.einsum('j,itj->itj', I_hat_sol, cons_hat_unit)
+
+        utility_cs_hat_sol = np.einsum('itj,itj->tj',
+                                       cons_hat_sol ** ((sigma - 1) / sigma),
+                                       sh['share_cons_o_np']) ** (sigma / (sigma - 1))
+
+        betas = (sh['cons_np']/(sh['cons_tot_np' ][None,None,:])).sum(axis=0)
+
+        utility_c_hat_sol = (utility_cs_hat_sol ** betas).prod(axis=0)
+
         cons_new = np.einsum('it,j,itj,itj -> itj', p_hat_sol, I_hat_sol , cons_hat_unit , sh['cons_np'])
         
         taxed_price = p_hat_sol*(1+carb_cost*sh['co2_intensity_np'])
@@ -477,9 +487,7 @@ def sol_from_loaded_data(carb_cost, run, cons, iot, output, va, co2_prod, sh):
         price_agg = np.divide(1, 
                         price_agg_no_pow , 
                         out = np.ones_like(price_agg_no_pow), 
-                        where = price_agg_no_pow!=0 ) ** (1/(sigma - 1))        
-        
-        betas = (sh['cons_np']/(sh['cons_tot_np' ][None,None,:])).sum(axis=0)
+                        where = price_agg_no_pow!=0 ) ** (1/(sigma - 1))
         
         price_index = (price_agg**betas).prod(axis=0)
         
@@ -491,7 +499,9 @@ def sol_from_loaded_data(carb_cost, run, cons, iot, output, va, co2_prod, sh):
         va['new'] = va_new.ravel()
         co2_prod['new'] = co2_prod_new.ravel()
 
-        return cons, iot, output, va, co2_prod , price_index
+        utility = pd.DataFrame(index=country_list, data=utility_c_hat_sol, columns=['new'])
+
+        return cons, iot, output, va, co2_prod , price_index, utility
             
 def load_everything(year_l,carb_cost_l,dir_num):
 

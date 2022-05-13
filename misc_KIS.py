@@ -80,7 +80,7 @@ labor_year = labor[year]
 # %% Aggregate price index change at 100$ tax (weighted average)
 
 # Obtain price index from loaded data
-cons, iot, output, va, co2_prod, price_index = t.sol_from_loaded_data(carb_cost, run, cons_b, iot_b, output_b, va_b,
+cons, iot, output, va, co2_prod, price_index, utility = t.sol_from_loaded_data(carb_cost, run, cons_b, iot_b, output_b, va_b,
                                                                       co2_prod_b, sh)
 
 # Calculate aggregation
@@ -124,8 +124,12 @@ wage.sort_values('value')
 wage.sort_values('new')
 
 # Create price change adjusted
-wage_adj = wage.hat.to_numpy()
+wage_adj = np.divide(1,wage.hat.to_numpy())
 price_agg_adj = np.einsum('si,i -> si', price_agg, wage_adj)
+
+# Add consumer price index and adjust by change in local wage
+wage['price_index'] = price_index
+wage['price_index_adj'] = wage['price_index'] / wage['hat']
 
 # Set up industry groups
 sector_map = pd.read_csv('data/industry_labels_after_agg_expl_wgroup.csv').set_index('ind_code')
@@ -171,8 +175,8 @@ ax.legend(handles=handles, fontsize=20)
 
 # ax.legend(group_labels_sorted)
 
-plt.title('(Tax = $100/Ton of CO2)', size=25, color=color)
-plt.suptitle('Sectoral consumer price change in Switzerland (%)', size=30, y=0.96)
+plt.title('(% change relative to wage change)', size=25, color=color)
+# plt.suptitle('Sectoral consumer price change in Switzerland (%)', size=30, y=0.96)
 
 plt.tight_layout()
 
@@ -276,23 +280,23 @@ ax.xaxis.set_major_formatter(ScalarFormatter())
 
 ax.hlines(0, xmin=sh['co2_intensity_np'].min(), xmax=1e5, colors='black', ls='--', lw=1)
 
-# sec = '20'
-# sector = sector_map.loc['D' + sec].industry
-# sector_index = sector_list.index(sec)
-#
-# country = 'RUS'
-# country_index = country_list.index(country)
-#
-# ax.annotate(country + ' - ' + sector,
-#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-#             xycoords='data',
-#             xytext=(-150, -100),
-#             textcoords='offset points',
-#             va='center',
-#             arrowprops=dict(arrowstyle="->",
-#                             connectionstyle="arc3", color='black'),
-#             bbox=dict(boxstyle="round", fc="w"), zorder=10
-#             )
+sec = '20'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'RUS'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(-200, -5),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
 
 sec = '28'
 sector = sector_map.loc['D' + sec].industry
@@ -1011,8 +1015,8 @@ total_output_decrease_percent = (total_output_net_decrease/total_output)*100
 total_output_reallocated = np.abs(sector_dist_df.realloc).sum()
 total_output_reallocated_percent = (total_output_reallocated/total_output)*100
 
-ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross (real) output \nwould be reallocated within a sector \nacross countries for a net reduction \nof (real) output of '+str(total_output_decrease_percent.round(2))+'%',
-             xy=(27,-30),fontsize=25,zorder=10,backgroundcolor='w')
+# ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross (real) output \nwould be reallocated within a sector \nacross countries for a net reduction \nof (real) output of '+str(total_output_decrease_percent.round(2))+'%',
+#              xy=(27,-30),fontsize=25,zorder=10,backgroundcolor='w')
 
 ax.grid(axis='x')
 
@@ -1148,7 +1152,7 @@ plt.show()
 
 print('Plotting production reallocation in percentages')
 
-country_dist_df.sort_values('total_change',inplace = True)
+country_dist_df.sort_values('change_percent',inplace = True)
 
 fig, ax = plt.subplots(figsize=(18,10),constrained_layout = True)
 
@@ -1214,8 +1218,8 @@ total_output_decrease_percent = (total_output_net_decrease/total_output)*100
 total_output_reallocated = np.abs(country_dist_df.realloc).sum()
 total_output_reallocated_percent = (total_output_reallocated/total_output)*100
 
-ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross (real) output \nwould be reallocated within a country \nacross sectors for a net reduction \nof (real) output of '+str(total_output_decrease_percent.round(2))+'%',
-             xy=(41,-20),fontsize=25,zorder=10,backgroundcolor='w')
+# ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross (real) output \nwould be reallocated within a country \nacross sectors for a net reduction \nof (real) output of '+str(total_output_decrease_percent.round(2))+'%',
+#              xy=(41,-20),fontsize=25,zorder=10,backgroundcolor='w')
 
 
 max_lim = country_dist_df['total_change'].max()
