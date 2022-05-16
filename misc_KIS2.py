@@ -110,7 +110,7 @@ for y in sol_all.keys():
         ['row_country', 'row_sector', 'col_country', 'col_sector'])
     del temp
 
-# %% Construct ilateral trade flows weighted by output and imports
+# %% Construct bilateral trade flows weighted by output and imports
 # Trade in final goods / intermediate inputs / total
 
 cons_imported = sol_all[y].cons.groupby(level=[1, 2]).sum().reset_index().copy()
@@ -133,11 +133,6 @@ cons_flows = pd.merge(
     on=['row_sector', 'col_country']
 )
 cons_flows.rename(columns={'value': 'value_imports', 'new': 'new_imports'}, inplace=True)
-
-# cons_flows['value'] = cons_flows['value_traded'] / (cons_flows['value_output'] * cons_flows['value_imports'])
-# cons_flows['new'] = cons_flows['new_traded'] / (cons_flows['new_output'] * cons_flows['new_imports'])
-# cons_flows['change'] = (cons_flows['new'] / cons_flows['value'] -1)*100
-# cons_flows['change_output'] = (cons_flows['new_output'] / cons_flows['value_output'] -1)*100
 
 # Trade in intermediate inputs
 iot_flows = pd.merge(
@@ -259,3 +254,13 @@ iot_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainabil
 
 total_network = network_create(trade_flows)
 total_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/total_network.csv')
+
+#%% Obtain mean value of change for maps
+# cons_flows['value'] = cons_flows['value_traded'] / (cons_flows['value_output'] * cons_flows['value_imports'])
+# cons_flows['new'] = cons_flows['new_traded'] / (cons_flows['new_output'] * cons_flows['new_imports'])
+# cons_flows['change'] = (cons_flows['new'] / cons_flows['value'] -1)*100
+# cons_flows['change_output'] = (cons_flows['new_output'] / cons_flows['value_output'] -1)*100
+
+cons_network.T.set_index('Sector').T
+
+cons_network[cons_network[' Total , Trade flow weighted change (%)'].isnull()][' Total , Trade flow weighted change (%)'].mean()
