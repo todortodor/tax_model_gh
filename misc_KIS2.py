@@ -281,7 +281,8 @@ sector_change = []
 sector_realloc_pos = []
 sector_realloc_neg = []
 for sector in sector_list:
-    temp = traded[y].groupby(level=[0,1,2]).sum().xs(sector,level=1).new-traded[y].groupby(level=[0,1,2]).sum().xs(sector,level=1).value
+    # temp = traded[y].groupby(level=[0,1,2]).sum().xs(sector,level=1).new-traded[y].groupby(level=[0,1,2]).sum().xs(sector,level=1).value
+    temp = traded[y].groupby(level=[1,2]).sum().xs(sector,level=0).new-traded[y].groupby(level=[1,2]).sum().xs(sector,level=0).value
     sector_change.append(temp.sum())
     sector_realloc_pos.append(temp[temp>0].sum())
     sector_realloc_neg.append(temp[temp<0].sum())
@@ -304,6 +305,16 @@ sector_dist_df['realloc_percent'] = (sector_dist_df['realloc']/sector_dist_df['t
 sector_dist_df['change_percent'] = (sector_dist_df['change']/sector_dist_df['traded'])*100
 sector_dist_df['change_tot'] = (sector_dist_df['change_percent']+sector_dist_df['realloc_percent'])
 sector_dist_df['realloc_share_neg'] = (sector_dist_df['realloc_percent']/sector_dist_df['change_tot']) * np.sign(sector_dist_df['change'])
+
+total_output_net_decrease = traded[y].value.sum() - traded[y].new.sum()
+total_output = traded[y].value.sum()
+total_output_decrease_percent = (total_output_net_decrease/total_output)*100
+
+total_output_reallocated = np.abs(sector_dist_df.realloc).sum()
+total_output_reallocated_percent = (total_output_reallocated/total_output)*100
+
+print('Overall, '+str(total_output_reallocated_percent.round(2))+'% of traded volumes \nwould be reallocated within a sector \nacross countries for a net reduction \nof trade flows of '+str(total_output_decrease_percent.round(2))+'%',
+          )
 
 #%% Production reallocation, nominal differences
 
@@ -501,28 +512,42 @@ country_realloc_pos = []
 country_realloc_neg = []
 
 Origin = False
+Sector = False
 
 if Origin:
     for country in country_list:
         # print(country)
-        temp = traded[y].groupby(level=[0,1,2]).sum().xs(country,level=0).new-traded[y].groupby(level=[0,1,2]).sum().xs(country,level=0).value
-        country_change.append(temp.sum())
-        country_realloc_pos.append(temp[temp>0].sum())
-        country_realloc_neg.append(temp[temp<0].sum())
+        if Sector:
+            temp = traded[y].groupby(level=[0,1]).sum().xs(country,level=0).new-traded[y].groupby(level=[0,1]).sum().xs(country,level=0).value
+            country_change.append(temp.sum())
+            country_realloc_pos.append(temp[temp>0].sum())
+            country_realloc_neg.append(temp[temp<0].sum())
+        else:
+            temp = traded[y].groupby(level=[0,2]).sum().xs(country, level=0).new - traded[y].groupby(level=[0,2]).sum().xs(country, level=0).value
+            country_change.append(temp.sum())
+            country_realloc_pos.append(temp[temp > 0].sum())
+            country_realloc_neg.append(temp[temp < 0].sum())
 
-    country_dist_df = pd.DataFrame(index=country_list)
-    country_dist_df['traded'] = traded[y].groupby(level=0).sum().value.values
-    country_dist_df['traded_new'] = traded[y].groupby(level=0).sum().new.values
+        country_dist_df = pd.DataFrame(index=country_list)
+        country_dist_df['traded'] = traded[y].groupby(level=0).sum().value.values
+        country_dist_df['traded_new'] = traded[y].groupby(level=0).sum().new.values
 else:
     for country in country_list:
-        temp = traded[y].groupby(level=[0, 1, 2]).sum().xs(country, level=2).new - traded[y].groupby(level=[0, 1, 2]).sum().xs(country, level=2).value
-        country_change.append(temp.sum())
-        country_realloc_pos.append(temp[temp > 0].sum())
-        country_realloc_neg.append(temp[temp < 0].sum())
+        if Sector:
+            temp = traded[y].groupby(level=[1,2]).sum().xs(country, level=1).new - traded[y].groupby(level=[1,2]).sum().xs(country, level=1).value
+            country_change.append(temp.sum())
+            country_realloc_pos.append(temp[temp > 0].sum())
+            country_realloc_neg.append(temp[temp < 0].sum())
+        else:
+            temp = traded[y].groupby(level=[0, 2]).sum().xs(country, level=0).new - traded[y].groupby(
+                level=[0, 2]).sum().xs(country, level=0).value
+            country_change.append(temp.sum())
+            country_realloc_pos.append(temp[temp > 0].sum())
+            country_realloc_neg.append(temp[temp < 0].sum())
 
-    country_dist_df = pd.DataFrame(index=country_list)
-    country_dist_df['traded'] = traded[y].groupby(level=2).sum().value.values
-    country_dist_df['traded_new'] = traded[y].groupby(level=2).sum().new.values
+        country_dist_df = pd.DataFrame(index=country_list)
+        country_dist_df['traded'] = traded[y].groupby(level=2).sum().value.values
+        country_dist_df['traded_new'] = traded[y].groupby(level=2).sum().new.values
 
 country_dist_df['realloc_pos'] = country_realloc_pos
 country_dist_df['realloc_neg'] = country_realloc_neg
@@ -560,11 +585,18 @@ if Origin:
                 ,label='Net change in exports',
                 # color=colors
                 )
-
-    ax.bar(country_dist_df.index.get_level_values(0)
+    if Sector:
+        ax.bar(country_dist_df.index.get_level_values(0)
                 ,country_dist_df.realloc/1e6
                 ,bottom = country_dist_df.change/1e6
-                ,label='Reallocated exports',
+                ,label='Reallocated exports across sectors',
+                # color=colors,
+                hatch="////")
+    else:
+        ax.bar(country_dist_df.index.get_level_values(0)
+                ,country_dist_df.realloc/1e6
+                ,bottom = country_dist_df.change/1e6
+                ,label='Reallocated exports across destinations',
                 # color=colors,
                 hatch="////")
 else:
@@ -575,12 +607,20 @@ else:
            # color=colors
            )
 
-    ax.bar(country_dist_df.index.get_level_values(0)
-           , country_dist_df.realloc / 1e6
-           , bottom=country_dist_df.change / 1e6
-           , label='Reallocated imports',
-           # color=colors,
-           hatch="////")
+    if Sector:
+        ax.bar(country_dist_df.index.get_level_values(0)
+               , country_dist_df.realloc / 1e6
+               , bottom=country_dist_df.change / 1e6
+               , label='Reallocated imports across sectors',
+               # color=colors,
+               hatch="////")
+    else:
+        ax.bar(country_dist_df.index.get_level_values(0)
+               , country_dist_df.realloc / 1e6
+               , bottom=country_dist_df.change / 1e6
+               , label='Reallocated imports across origins',
+               # color=colors,
+               hatch="////")
 
 ax.set_xticklabels(['']
                     , rotation=75
@@ -626,13 +666,25 @@ total_output_reallocated = np.abs(country_dist_df.realloc).sum()
 total_output_reallocated_percent = (total_output_reallocated/total_output)*100
 
 if Origin:
-    ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of trade volumes \nwould be reallocated within an \nexporting country across sectors \nfor a net reduction of trade flows \nof '+str(total_output_decrease_percent.round(2))+'%',
+    if Sector:
+        ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of trade volumes \nwould be reallocated within an \nexporting country across sectors \nfor a net reduction of trade flows \nof '+str(total_output_decrease_percent.round(2))+'%',
              xy=(41,-0.2),fontsize=25,zorder=10,backgroundcolor='w')
+    else:
+        ax.annotate('Overall, ' + str(total_output_reallocated_percent.round(
+            2)) + '% of trade volumes \nwould be reallocated within an \nexporting country across destinations \nfor a net reduction of trade flows \nof ' + str(
+            total_output_decrease_percent.round(2)) + '%',
+                    xy=(41, -0.12), fontsize=25, zorder=10, backgroundcolor='w')
 else:
-    ax.annotate('Overall, ' + str(total_output_reallocated_percent.round(
+    if Sector:
+        ax.annotate('Overall, ' + str(total_output_reallocated_percent.round(
         2)) + '% of trade volumes \nwould be reallocated within an \nimporting country across sectors \nfor a net reduction of trade flows \nof ' + str(
         total_output_decrease_percent.round(2)) + '%',
-                xy=(41, -0.2), fontsize=25, zorder=10, backgroundcolor='w')
+                xy=(41, -0.15), fontsize=25, zorder=10, backgroundcolor='w')
+    else:
+        ax.annotate('Overall, ' + str(total_output_reallocated_percent.round(
+            2)) + '% of trade volumes \nwould be reallocated within an \nimporting country across origins \nfor a net reduction of trade flows \nof ' + str(
+            total_output_decrease_percent.round(2)) + '%',
+                    xy=(41, -0.12), fontsize=25, zorder=10, backgroundcolor='w')
 
 max_lim = country_dist_df['change_tot_nom'].max()/1e6
 min_lim = country_dist_df['change_tot_nom'].min()/1e6
@@ -659,13 +711,20 @@ if Origin:
                 ,label='Net change in exports (%)',
                 # color=colors
                 )
-
-    ax.bar(country_dist_df.index.get_level_values(0)
+    if Sector:
+        ax.bar(country_dist_df.index.get_level_values(0)
                 ,country_dist_df.realloc_percent
                 ,bottom = country_dist_df.change_percent
-                ,label='Reallocated exports (%)',
+                ,label='Reallocated exports across sectors (%)',
                 # color=colors,
                 hatch="////")
+    else:
+        ax.bar(country_dist_df.index.get_level_values(0)
+               , country_dist_df.realloc_percent
+               , bottom=country_dist_df.change_percent
+               , label='Reallocated exports across destinations (%)',
+               # color=colors,
+               hatch="////")
 else:
     ax.bar(country_dist_df.index.get_level_values(0)
            , country_dist_df.change_percent
@@ -674,12 +733,20 @@ else:
            # color=colors
            )
 
-    ax.bar(country_dist_df.index.get_level_values(0)
+    if Sector:
+        ax.bar(country_dist_df.index.get_level_values(0)
            , country_dist_df.realloc_percent
            , bottom=country_dist_df.change_percent
-           , label='Reallocated imports (%)',
+           , label='Reallocated imports across sectors (%)',
            # color=colors,
            hatch="////")
+    else:
+        ax.bar(country_dist_df.index.get_level_values(0)
+               , country_dist_df.realloc_percent
+               , bottom=country_dist_df.change_percent
+               , label='Reallocated imports across origins (%)',
+               # color=colors,
+               hatch="////")
 
 ax.set_xticklabels(['']
                     , rotation=75
@@ -825,7 +892,7 @@ plt.show()
 #%% Connectivity measure
 print('Computing connectivities')
 
-real = True
+real = False
 if real:
     c_c = tot[y].join(price_hat)
     c_c['new'] = c_c.new / c_c.price_hat
@@ -841,7 +908,7 @@ imports = c_c.groupby(level=1).sum().rename_axis('country')
 # Compute self share as share of total exports consumed locally
 own_trade = c_c.reset_index()[c_c.reset_index().row_country == c_c.reset_index().col_country]
 own_trade = own_trade.drop('col_country',axis=1).rename(columns={'row_country' : 'country'})
-own_trade = own_trade.merge(exports.reset_index(),suffixes = ['','_total_exchange'],on='country')
+own_trade = own_trade.merge(imports.reset_index(),suffixes = ['','_total_exchange'],on='country')
 
 own_trade['value_self'] = own_trade.value / own_trade.value_total_exchange
 own_trade['new_self'] = own_trade.new / own_trade.new_total_exchange
@@ -918,24 +985,24 @@ coeffs_fit = np.polyfit(own_trade['co2_intensity'],
 x_lims = (0,900)
 # y_lims = (-0.0025*200,0.0025*200)
 ax.set_xlim(*x_lims)
-y_lims = (-5,5)
+y_lims = (-6,6)
 ax.set_ylim(*y_lims)
-#
-#
-# x_vals = np.arange(0,x_lims[1])
-# y_vals = coeffs_fit[1] + coeffs_fit[0] * x_vals
-# ax.plot(x_vals, y_vals, '-',lw=2,color='k',label='Regression line')
-#
-# ax.hlines(y=0,xmin=x_lims[0],xmax=x_lims[1],ls='--',lw=1,color='k')
+
+
+x_vals = np.arange(0,x_lims[1])
+y_vals = coeffs_fit[1] + coeffs_fit[0] * x_vals
+ax.plot(x_vals, y_vals, '-',lw=2,color='k',label='Regression line')
+
+ax.hlines(y=0,xmin=x_lims[0],xmax=x_lims[1],ls='--',lw=1,color='k')
 
 ax.set_xlabel('CO2 intensity of production (Ton CO2 / $Mio.)',fontsize = 20)
-# ax.set_ylabel('Connectivity to the global trade, evolution prediction',fontsize = 20)
+ax.set_ylabel('Change in export share (%)',fontsize = 20)
 
 # plt.legend(loc='lower right')
 # ax.legend(loc='lower right')
 
-# texts = [plt.text(own_trade['co2_intensity'].loc[country],  own_trade['connectivity_diff'].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
-# adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
+texts = [plt.text(own_trade['co2_intensity'].loc[country],  own_trade[variable].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
+adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
 # adjust_text(texts, precision=0.001,
 #         expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
 #         force_text=(0.01, 0.25), force_points=(0.01, 0.25),
@@ -1045,7 +1112,7 @@ ax.tick_params(axis='y', labelsize = 20)
 ax.margins(x=0.01)
 ax.set_ylabel('% of initial share', fontsize = 20)
 
-# leg = ax.legend(fontsize=20,loc='lower right')
+leg = ax.legend(fontsize=20,loc='upper left')
 
 ax.grid(axis='x')
 
@@ -1059,6 +1126,204 @@ ax.bar_label(ax.containers[0],
 max_lim = sector_dist_df['diff_pc'].max()
 min_lim = sector_dist_df['diff_pc'].min()
 ax.set_ylim(min_lim-6,max_lim+5)
+
+plt.show()
+
+#%% Correlation between change in share of traded output and sector's relative dirtyness
+
+s_co2_intensity = sol_all[y].co2_prod.groupby(level=1).sum().value / sol_all[y].output.groupby(level=1).sum().value
+sector_dist_df['co2_int'] = s_co2_intensity.values*1e6
+
+sector_list = sector_dist_df.sort_values('group_code').industry.to_list()
+sector_dist_df = sector_dist_df.reset_index().set_index('industry').sort_values('group_code')
+
+#%%
+palette = [sns.color_palette('bright')[i] for i in [2,4,0,3,1,7]]
+palette[0] = sns.color_palette()[2]
+palette[1] = sns.color_palette("hls", 8)[-2]
+
+sector_colors = {
+    'Agro-food' : palette[0],
+    'Raw materials' : palette[1],
+    'Manufactures' : palette[2],
+    'Energy' : palette[3],
+    'Services ' : palette[4],
+    'Logistics' : palette[5],
+                    }
+colors = [sector_colors[sector_dist_df.sort_values('group_code').loc[industry,'group_label']] for industry in sector_list]
+
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout = True)
+for i,group in enumerate(data_no_z_i.group_code.drop_duplicates().to_list()):
+    ax.scatter(sector_dist_df[sector_dist_df['group_code'] == group].co2_int,sector_dist_df[sector_dist_df['group_code'] == group].diff_pc,s=50, color=palette[i], marker='x',lw=2,zorder=1-i)
+
+# ax.scatter(sector_dist_df.co2_int,sector_dist_df.diff_pc,marker='x',lw=2,s=50)
+
+# sns.kdeplot(data=sector_dist_df,
+#                 x='co2_int',
+#                 y="diff_pc",
+#                 hue = 'group_code',
+#                 fill = True,
+#                 alpha = 0.2,
+#                 # height=10,
+#                 # ratio=5,
+#                 # bw_adjust=0.7,
+#                 # weights = 'labor',
+#                 # legend=False,
+#                 levels = 2,
+#                 palette = palette,
+#                 # log_scale = (True, False)
+#                 # common_norm = False,
+#                 shade=True,
+#                 thresh = 0.15,
+#                 dropna=True,
+#                 # fill = False,
+#                 # alpha=0.6,
+#                 # hue_order = sector_dist_df.group_label.drop_duplicates().to_list()[::-1],
+#                 ax = ax
+#                 )
+
+coeffs_fit = np.polyfit(sector_dist_df.co2_int,
+                  sector_dist_df.diff_pc,
+                  deg = 1,
+                  #w=emissions.labor
+                  )
+
+ax.set_xlabel('Carbon intensity of production (Tons / Mio.$)', fontsize = 20)
+ax.set_ylabel('Change in share of traded output (%)', fontsize = 20)
+
+# ax.set_yscale('log')
+ax.set_xscale('log')
+x_lims = (10,2000)
+# x_lims = (10,4000)
+ax.set_xlim(*x_lims)
+y_lims = (-5,10)
+# y_lims = (-50,50)
+ax.set_ylim(*y_lims)
+
+# x_vals = np.arange(0,x_lims[1])
+# y_vals = coeffs_fit[1] + coeffs_fit[0] * x_vals
+# ax.plot(x_vals, y_vals, '-',lw=2,color='k',label='Regression line')
+
+ax.hlines(y=0,xmin=x_lims[0],xmax=x_lims[1],ls='--',lw=1,color='k')
+
+# texts = [plt.text(sector_dist_df['co2_int'].loc[industry],  sector_dist_df['diff_pc'].loc[industry], industry,size=15,color=colors[i]) for i,industry in enumerate(sector_list)]
+# adjust_text(texts,
+#             precision=0.001,
+#             expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+#             force_text=(0.01, 0.25), force_points=(0.01, 0.25)
+#             , arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
+
+sect = 'Energy'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(50, 15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Mining, energy'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(50, 15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Basic metals'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(50, 15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Agriculture'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(50, 15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Electronic'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(50, 15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Air transport'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(80, -15),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Machinery'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(15, -30),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sect = 'Food products'
+sect_index = sector_list.index(sect)
+ax.annotate(sect,
+            xy=(sector_dist_df.loc[sect].co2_int, sector_dist_df.loc[sect].diff_pc),
+            xycoords='data',
+            xytext=(-80, -35),
+            textcoords='offset points',
+            va='center',
+            color=colors[sect_index],
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
 
 plt.show()
 
