@@ -343,7 +343,7 @@ nodes_unpivoted, edges_unpivoted, nodes_total, edges_total = \
 'Education', 'Health', 'Entertainment', 'Other service']
 """
 y=2018
-sector = 'Total'
+sector = 'Machinery'
 country = None
 print(sector)
 print(country)
@@ -500,12 +500,31 @@ p4c.toggle_graphics_details()
     # p4c.set_network_zoom_bypass(10, bypass=True)
 # if fit_view:
 p4c.fit_content()
+europe = ['SVN','POL','IRL','NLD','EST','DNK','GRC','SWE','AUT','NOR','PRT','ITA',
+          'CHE','SVK','ISL','ESP','BEL','LTU','CZE','FRA','LVA','HRV','FIN','DEU','ROU','BGR']
+rest_of_europe = [c for c in europe if c != country]
 if country is not None:
     p4c.set_node_property_bypass(country, 'diamond', 'NODE_SHAPE')
     p4c.add_annotation_text(text=title, x_pos=-1000, y_pos=800, font_size=100, font_family=None, font_style=None)
     p4c.set_node_property_bypass(country, 1e9, 'NODE_Z_LOCATION')
+    if country in europe:
+        p4c.set_node_property_bypass(country, 190, 'NODE_TRANSPARENCY')
+p4c.set_node_property_bypass(rest_of_europe, 140, 'NODE_TRANSPARENCY')        
+    
+# if country in europe:
+
+    # p4c.set_node_property_bypass(p4c.get_all_nodes(), -1e9, 'NODE_DEPTH')
+    # p4c.set_edge_property_bypass(list(p4c.get_table_columns(table='edge', columns='name')['name']), 100000, 'EDGE_Z_ORDER')
 # p4c.set_network_property_bypass(10, 'NETWORK_SCALE_FACTOR')
 # p4c.clear_network_zoom_bypass()
+p4c.get_edge_property
+#%% export as image
+p4c.hide_all_panels()
+p4c.fit_content()
+p4c.export_image(filename='../'+title, type='PNG', resolution=600, units='inches', height=24*3/5, width=24, zoom=None,
+                  network=None, overwrite_file=False)
+
+
 #%% choose color palette
 # from numpy import arange
 # x = arange(25).reshape(5, 5)
