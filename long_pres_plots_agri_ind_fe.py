@@ -455,7 +455,7 @@ carb_cost_l = np.linspace(0, 1e-3, 101)
 
 for carb_cost in tqdm(carb_cost_l):
     run = runs.iloc[np.argmin(np.abs(runs['carb_cost'] - carb_cost))]
-    utility.append(run.utility)
+    # utility.append(run.utility)
     emissions.append(run.emissions)
 
     sigma = run.sigma
@@ -465,7 +465,7 @@ for carb_cost in tqdm(carb_cost_l):
 
     # res = pd.read_csv(run.path).set_index(['country','sector'])
 
-    cons, iot, output, va, co2_prod, price_index = t.sol_from_loaded_data(carb_cost, run, cons_b, iot_b, output_b, va_b,
+    cons, iot, output, va, co2_prod, price_index, utility_countries = t.sol_from_loaded_data(carb_cost, run, cons_b, iot_b, output_b, va_b,
                                                                           co2_prod_b, sh)
 
     gross_output_new.append(cons.new.to_numpy().sum() + iot.new.to_numpy().sum())
@@ -474,6 +474,8 @@ for carb_cost in tqdm(carb_cost_l):
     traded_share_new.append(traded_new[-1] / gross_output_new[-1])
     gdp_new.append(va.new.sum())
     gdp.append(va.value.sum())
+    utility.append(utility_countries.new.mean())
+
     for country in countries:
         price_index_l[country].append(price_index[country_list.index(country)])
 
@@ -790,11 +792,10 @@ plt.show()
 
 print('Plotting consumer price index changes for multiple countries')
 
-countries = ['DEU','CHN','USA','CHE']#,'FRA','CHE','CZE']
-
-# countries = country_list
-countries_to_label = ['DEU','CHN','USA','CHE']
-# countries_to_label = country_list
+# countries = ['DEU','CHN','USA','CHE']#,'FRA','CHE','CZE']
+countries = country_list
+# countries_to_label = ['DEU','CHN','USA','CHE']
+countries_to_label = country_list
 
 infl = {}
 infl['DEU'] = 5.1
@@ -805,7 +806,7 @@ infl['CHE'] = 2.2
 
 inf_l = [5.1,0.9,7.9,2.2]
 carb_tax_eq_l = []
-plot_inflation = True
+plot_inflation = False
 
 if plot_inflation:
     for i,country in enumerate(countries):
@@ -816,7 +817,7 @@ color = 'tab:blue'
 
 ax1.set_xlabel('Carbon tax (dollar / ton of CO2)',size = 30)
 ax1.set_xlim(0,1000)
-ax1.set_ylim(0,25)
+# ax1.set_ylim(0,25)
 ax1.tick_params(axis='x', labelsize = 20)
 
 ax1.set_ylabel('Consumer price index change (%)',size = 28)
@@ -830,9 +831,10 @@ for i,country in enumerate(countries):
     # ax1.scatter(carb_tax_eq*1e6,infl[country],lw=2,zorder=10)
 if plot_inflation:
     ax1.scatter(np.array(carb_tax_eq_l)*1e6,np.array(inf_l),lw=4,zorder=10,c=sns.color_palette()[0:len(countries)],label='Inflation Feb22')
-ax1.legend()
+    ax1.set_yticks([y for y in np.linspace(0, 25, 11)])
+    ax1.legend()
 ax1.set_xticks([x for x in np.linspace(0,1000,11)])
-ax1.set_yticks([y for y in np.linspace(0,25,11)])
+
 
 if plot_inflation:
     leg = ax1.get_legend()
