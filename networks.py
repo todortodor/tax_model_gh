@@ -31,10 +31,9 @@ sns.set_style("whitegrid")
 # carb_cost = 1e-4
 
 sol_all = {}
-dir_num = 8
+dir_num = 9
 carb_cost = 1e-4
 # carb_cost = {}
-
 if dir_num>7:
     import treatment_funcs_agri_ind_fe as t
 elif dir_num>5:
@@ -45,7 +44,7 @@ else:
 dollar_adjustment = pd.read_csv('data/dollar_adjustment.csv',sep=';',decimal=',').set_index('year')
 
 # for y in range(1995,2019):
-for y in range(2018,2019):
+for y in range(1995,2019):
     print(y)
     year = str(y)
     # sol_all[y] = t.sol(y,dir_num,dollar_adjustment.loc[y]['dollar_adjusted']*carb_cost)
@@ -168,7 +167,7 @@ c_c.loc[c_c.row_country == 'NZL',['longitude']] = 154
 
 #%% write csv
 
-# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
+c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test2.csv')
 
 
 #%% look for a specific flow
@@ -288,7 +287,7 @@ c_c['labels-edge'] = ((c_c['hat']-1)*100).round(1)
 
 #%% write csv
 
-# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
+# c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/regions3.csv')
 
 
 #%% by regions with sectors
@@ -475,7 +474,7 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_regions_agri_ind_fe.csv')
+c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/regions_with_sectors_2018.csv')
 
 #%%  by country with sectors
 
@@ -647,4 +646,4 @@ c_c.drop('Quantity',inplace = True)
 # c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors.csv')
 
 # c_c.reset_index().to_csv('/Users/simonl/Documents/taff/tax_model/graphs/test_with_sectors2.csv')
-c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/data_country_agri_ind_fe.csv')
+c_c.to_csv('/Users/simonl/Documents/taff/tax_model/graphs/countries_with_sectors_2018.csv')
