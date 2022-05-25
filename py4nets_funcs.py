@@ -323,8 +323,8 @@ def make_title(sector, country, input_or_output, nominal_values_or_shares, final
 
 def load_baseline_compute_initial(carb_cost,y,final_or_inter_or_total):
     sol_all = {}
-    dir_num = 9
-    
+    dir_num = 8
+
     print(y)
     print('Loading baseline datas and results')
     year = str(y)
