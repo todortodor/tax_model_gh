@@ -18,10 +18,10 @@ nodes_unpivoted, edges_unpivoted, nodes_total, edges_total, world = py4nets.load
 
 #%% build and display the network
 
-sector = 'Water transport' #'a sector' (see list) or 'Total'
-country = 'CHN' #'a country' (see list) or None to build the whole network
-input_or_output = 'input' #'input' or 'output'
-nominal_values_or_shares = 'values' #'values' or 'shares'
+sector = 'Machinery' #'a sector' (see list) or 'Total'
+country = None #'a country' (see list) or None to build the whole network
+input_or_output = 'output' #'input' or 'output'
+nominal_values_or_shares = 'shares' #'values' or 'shares'
 write_title_in_antartica = False #True or False
 
 
@@ -111,7 +111,7 @@ If 'input':
 
 #%% export as an image
 
-path = 'graph_images/'
+path = '../tax_model_maps/'
 height = 4000
 width = 8000
 py4nets.export_as_image(path,height,width)

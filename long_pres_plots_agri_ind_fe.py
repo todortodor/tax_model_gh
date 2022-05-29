@@ -648,12 +648,48 @@ ax[1,0].annotate(str(y_100.round(3)),
               xytext=(-50,-10),
               textcoords='offset points',color=color)
 
+# Bottom right summary
 ax[1,1].plot(np.array(carb_cost_l)*1e6,np.array(gdp_new)/gdp_new[0],lw=4)
 ax[1,1].plot(np.array(carb_cost_l)*1e6,utility,lw=4,color='r')
 ax[1,1].plot(np.array(carb_cost_l)*1e6,np.array(emissions)/emissions[0],lw=4,color='g')
 ax[1,1].legend(['GDP','Welfare','Emissions'])
 ax[1,1].set_xlabel('Carbon tax (dollar/ton of CO2)')
 ax[1,1].set_xlim(0,1000)
+
+# Alternative (for short pres) - Share of traded output
+# color2 = sns.color_palette()[4]
+# ax[1,1].plot(np.array(carb_cost_l)*1e6,np.array(traded_share_new)/traded_share_new[0],lw=4,color=color2)
+# ax[1,1].legend(['Share of traded output'])
+# ax[1,1].set_xlabel('Carbon tax ($/ton of CO2)')
+# ax[1,1].set_xlim(0,1000)
+#
+# y_100 = (np.array(traded_share_new)/traded_share_new[0])[np.argmin(np.abs(np.array(carb_cost_l)*1e6 -100))]
+#
+# ax[1,1].vlines(x=100,
+#             ymin=(np.array(traded_share_new)/traded_share_new[0]).min() - 0.005,
+#             ymax=y_100,
+#             lw=3,
+#             ls = '--',
+#             color = color)
+#
+# ax[1,1].hlines(y=y_100,
+#             xmin=0,
+#             xmax=100,
+#             lw=3,
+#             ls = '--',
+#             color = color)
+#
+# ax[1,1].margins(y=0)
+#
+# ax[1,1].set_ylim((np.array(traded_share_new)/traded_share_new[0]).min() - 0.005, (np.array(traded_share_new)/traded_share_new[0]).max() + 0.005)
+#
+# ax[1,1].annotate(str(y_100.round(3)),
+#               xy=(0,y_100),
+#               xytext=(-50,-5),
+#               textcoords='offset points',color=color)
+#
+# # ax[1,0].set_yticks([1.00,1.01,1.02,1.03])
+# # ax[1,0].set_yticklabels(['', '1.01', '1.02', '1.03'])
 
 plt.tight_layout()
 
@@ -2632,7 +2668,7 @@ print('Plotting different GSI choices and welfare cost of change')
 fig, ax = plt.subplots(figsize=(12,8))
 
 lw = 3
-ax1 = ax.twinx()
+# ax1 = ax.twinx()
 
 traded_ls = '--'
 
@@ -2669,18 +2705,18 @@ ax.plot(years,c_s_c,label='Origin x Destination x Sectors (3)',color = sns.color
 # ax.plot(years,c_s_local,label='c_s_dist_local',color = sns.color_palette()[4],lw=lw,ls = local_ls)
 
 # ax1.plot(years,gross_output_reduction_necessary,color = 'k', lw=2, ls= '--', label = 'Net output reduction')
-ax1.plot(years,welfare_change,color = sns.color_palette()[0], lw=2, label = 'Welfare cost')
+# ax1.plot(years,welfare_change,color = sns.color_palette()[0], lw=2, label = 'Welfare cost')
 # ax1.plot(years,share_traded_change,color = 'k', lw=2)
 
 ax.set_ylabel('GSI computed on different quantities (legend)',fontsize = 20,color = sns.color_palette()[3])
-ax1.set_ylabel('Welfare cost of transition',fontsize = 20,color = sns.color_palette()[0])
+# ax1.set_ylabel('Welfare cost of transition',fontsize = 20,color = sns.color_palette()[0])
 
 
 # ax.legend(loc = (0.45,1.02),fontsize = 20, title = 'GSI computed on :')
-# ax.legend(fontsize = 20, title = 'GSI computed on :')
+ax.legend(fontsize = 20, title = 'GSI computed on :')
 # ax1.legend(fontsize = 20,loc = 'upper center')
 
-ax1.grid(visible=False)
+# ax1.grid(visible=False)
 
 ax.set_xticks(years)
 ax.set_xticklabels(years

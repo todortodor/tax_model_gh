@@ -21,11 +21,11 @@ sns.set_style('whitegrid')
 
 #%% Historical plots - Set up
 
-fixed_carb_tax = False  # if True, will load historical data for a given carbon cost
+fixed_carb_tax = True # if True, will load historical data for a given carbon cost
 carb_cost = 1e-4
 adjust = False  # if True, will adjust for dollar according to US inflation
 
-emissions_target = True  # if True, will load historical data for a given emissions target
+emissions_target = False  # if True, will load historical data for a given emissions target
 reduction_target = 0.7  # emissions target in proportion of baseline emissions
 
 if fixed_carb_tax:
@@ -351,5 +351,61 @@ ax.legend()
 ax.set_xlabel('GSI')
 ax.set_ylabel('Trade contribution to emissions reduction (%)')
 plt.title('Trade contribution to reduce emissions by  30%')
+
+plt.show()
+
+# %% Plot one GSI
+
+color = sns.color_palette()[2]
+
+fig, ax = plt.subplots(figsize=(12,8))
+
+dist = c_s_c
+one_bar = 0.99775
+
+ax.plot(years,dist,lw=4,color=color)
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                   , rotation=45
+                   , ha='right'
+                   , rotation_mode='anchor'
+                   ,fontsize=19)
+ax.set_title('Global Sustainability Index'
+              ,color=color
+              ,fontsize=28
+              ,pad=15
+              )
+ax.tick_params(axis='y', labelsize = 20)
+ax.margins(x=0)
+
+ax.hlines(y=one_bar,
+           xmin=1995,
+           xmax=2018,
+           lw=3,
+           ls = '--',
+           color = color)
+
+ax.annotate(1,
+             xy=(1995, one_bar),
+             xytext=(-50,-5),
+            fontsize = 20,
+             textcoords='offset points',color=color)
+
+ax.annotate("Sustainable organization of trade\n with a $100 carbon tax",
+            xy=(2009, one_bar), xycoords='data',
+            xytext=(2009-2.5, one_bar-0.0004),
+            textcoords='data',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3",color= 'black'),
+            bbox=dict(boxstyle="round", fc="w")
+            )
+
+ax.grid(axis='x')
+
+ax.set_yticks([0.9960, 0.9965, 0.9970, 0.9975, 0.99775])
+ax.set_yticklabels(['0.9960', '0.9965', '0.9970', '0.9975', ''])
+
+plt.tight_layout()
 
 plt.show()
