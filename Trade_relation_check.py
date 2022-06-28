@@ -839,12 +839,18 @@ min_lim = sector_dist_df['diff_pc'].min()
 ax.set_ylim(min_lim-6,max_lim+5)
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/sector_X_share.eps',format='eps')
+keep = {'sector': sector_dist_df.industry, 'change': sector_dist_df.diff_pc}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/sector_X_share.csv')
+
 
 #%% Changes in geographical share of traded output - What country should export/import relatively more?
 print('Computing trade reallocation country-wise - Origin/Exporting country or Destination/Importing country')
 
 #Condition
-Origin = False       # If true we consider export share of total output
+Origin = True       # If true we consider export share of total output
                     # If False we consider import share of total demand (differ from output by the deficit)
 
 # Construct dataframe
@@ -958,17 +964,23 @@ min_lim = country_dist_df['diff_pc'].min()
 ax.set_ylim(min_lim-1,max_lim+1)
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/country_X_share.eps',format='eps')
+keep = {'country': country_dist_df.index.get_level_values(0), 'change': country_dist_df.diff_pc}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/country_X_share.csv')
+
 
 # %% COMPOSITION EFFECTS
 
 # %% Changes in sectoral composition of a country's production
-print('Plotting gross output composition for '+country)
-
 # Conditions
-country = 'SAU'             # Country of consideration
-variable = 'change_share'   # 'value_share' for current composition
+country = 'KHM'             # Country of consideration
+variable = 'value_share'   # 'value_share' for current composition
                             # 'new_share' for counterfactual composition
                             # 'change_share' for relative change in share
+
+print('Plotting gross output composition for '+country)
 
 # Construct sectoral output shares
 sc_df = sol_all[y].output.copy()
@@ -1019,7 +1031,7 @@ plt.show()
 
 # %% Changes in sectoral composition of a country's exports OR imports
 # Conditions
-country = 'BRA'                 # Country of interest
+country = 'KHM'                 # Country of interest
 Exports = True                  # If true we're looking at the sectoral composition of exports
                                 # If false we're looking at the sectoral composition of imports
 variable1 = 'value_share'

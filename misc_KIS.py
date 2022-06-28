@@ -181,6 +181,11 @@ plt.title('(% change relative to wage change)', size=25, color=color)
 plt.tight_layout()
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.eps',format='eps')
+keep = sector_map.copy()
+keep['price_change'] = ((price_agg_adj[:, country_list.index(country)] - 1) * 100).tolist()
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.csv')
 
 # %% Scatter plot of gross ouput change with kernel density by coarse industry
 
@@ -389,6 +394,13 @@ ax.annotate(country + ' - ' + sector,
 #             )
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.eps',format='eps')
+keep = data_no_z.copy().drop('output', axis=1).rename(columns={'value':'change'})
+add = sector_map[['industry']].copy()
+add.index.names = ['sector']
+keep = keep.join(add, how='left')
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.csv')
 
 # %% Labor transfers
 
@@ -777,6 +789,12 @@ ax.bar_label(ax.containers[0],
 
 plt.show()
 
+# # SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.eps',format='eps')
+keep = country_df[['realloc_percent']].copy()
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.csv')
+
+
 # %% Reallocation with constant prices
 
 # %% Calculate total output as q_hat * cons_b + m_hat * iot_b`
@@ -1032,6 +1050,10 @@ min_lim = sector_dist_df['change_tot'].min()
 ax.set_ylim(min_lim-5,max_lim+10)
 
 plt.show()
+# # SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/sector_realloc.eps',format='eps')
+keep = sector_use[['industry', 'change_percent', 'realloc_percent', 'change_tot']].copy()
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/sector_realloc.csv')
 
 #%% Country specific reallocation of production
 
@@ -1227,6 +1249,10 @@ min_lim = country_dist_df['total_change'].min()
 ax.set_ylim(min_lim-2,max_lim+2)
 
 plt.show()
+# # SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/country_realloc.eps',format='eps')
+keep = country_dist_df[['change_percent', 'realloc_percent', 'total_change']].copy()
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/country_realloc.csv')
 
 
 # %% Reallocation with constant quantities (price adjustment effect)

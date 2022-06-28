@@ -80,6 +80,16 @@ ax.tick_params(axis='both', labelsize=20 )
 # ax.set_title('Main greenhouse gases emissions (in Gt of CO2 equivalent)',fontsize=25,pad=15)
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/data_em.eps',format='eps')
+keep = ghg.unstack(level=0).droplevel(level=0, axis=1)[[ 'Electricity/Heat',
+        'Manufacturing/Construction','Transportation','Agriculture','Forest fires',
+         'Fugitive Emissions', 'Industrial Processes','Other Fuel Combustion',
+        'Waste', 'Forestland']]
+keep['Baseline_em'] = np.array(emissions_baseline)/1e3
+keep['Forestland'] = - keep['Forestland']
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/data_em.csv')
+
 
 #%% GHG distrib over time by gas - Climate watch data
 
@@ -292,6 +302,11 @@ ax.set_ylabel('Dollars per ton of carbon',fontsize = 20)
 plt.title('Average carbon price on emissions that fall under a pricing scheme',fontsize=20)
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/pricing.eps',format='eps')
+keep = carbon_prices.unstack(level=0).price
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/pricing.csv')
+
 
 fig, ax = plt.subplots(figsize=(12,8))
 
@@ -695,6 +710,15 @@ plt.tight_layout()
 
 plt.show()
 
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.eps',format='eps')
+keep = {'Tax': np.array(carb_cost_l)*1e6, 'Emissions': np.array(emissions)/1e3,
+        'GDP': np.array(gdp_new)/1e6, 'Welfare': utility, 'GDP_index': np.array(gdp_new)/gdp_new[0],
+        'Emissions_index': np.array(emissions)/emissions[0]}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.csv')
+
+
 #%% Effect on output share traded
 
 print('Plotting share of output traded')
@@ -729,7 +753,8 @@ ax1.tick_params(axis='y', labelsize = 20)
 ax1.margins(y=0)
 
 # ax1.set_ylim((np.array(traded_share_new)*100).min()-0.05, (np.array(traded_share_new)*100).max() + 0.05)
-ax1.set_ylim(12,15)
+# ax1.set_ylim(12,15)
+ax1.set_ylim(12.9,13.6)
 
 # ax[1,0].annotate(str(y_100.round(3)),
 #               xy=(0,y_100),
@@ -741,6 +766,13 @@ ax1.set_ylim(12,15)
 
 plt.tight_layout
 plt.show()
+
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.eps',format='eps')
+keep = {'Tax': np.array(carb_cost_l)*1e6, 'share': np.array(traded_share_new)*100}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.csv')
+
 
 #%% Accounting for SCC
 
@@ -2124,7 +2156,7 @@ print('Computing inequalities in terms of GDP change')
 
 # Construct GDP per capita and welfare change
 gdp = sol_all[y].va.groupby(level=0).sum()
-gdp['price_index'] = price_index
+# gdp['price_index'] = price_index
 
 gdp = gdp.join(labor_year).rename(columns={year:'labor'})
 gdp['per_capita'] = (gdp.value / gdp.labor)*1e3
@@ -2176,13 +2208,13 @@ sns.kdeplot(data=gdp,
                 # height=10,
                 # ratio=5,
                 # bw_adjust=0.7,
-                # weights = 'labor',
+                weights = 'labor',
                 # legend=False,
                 levels = 2,
                 palette = palette,
                 # common_norm = False,
                 shade=True,
-                thresh = 0.12,
+                thresh = 0.2,
                 # dropna=True,
                 # fill = False,
                 # alpha=0.6,
@@ -2208,6 +2240,10 @@ adjust_text(texts, precision=0.001,
                         ))
 
 plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.eps',format='eps')
+keep = gdp[['per_capita', 'utility_percent_change', 'Continent']]
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.csv')
 
 #%% Correcting inequalities, the cost
 

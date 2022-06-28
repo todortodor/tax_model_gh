@@ -244,7 +244,7 @@ fig, ax = plt.subplots(figsize=(12,8))
 lw = 3
 
 ax.plot(years,share_value,label='Baseline',color = sns.color_palette()[5],lw=lw)
-# ax.plot(years,share_new,label='Counterfactual',color = sns.color_palette()[2],lw=lw)
+ax.plot(years,share_new,label='Counterfactual',color = sns.color_palette()[2],lw=lw)
 
 ax.set_ylabel('% of total emissions',fontsize = 20,color = sns.color_palette()[3])
 
@@ -254,9 +254,15 @@ ax.set_xticklabels(years
                    , ha='right'
                    , rotation_mode='anchor'
                    ,fontsize=19)
-# ax.legend()
+ax.legend()
 
-plt.show()
+plt.show()# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_em.eps',format='eps')
+keep = {'year': years, 'Baseline': share_value, 'Counterfactual': share_new}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_em.csv')
+
+
 
 #%%
 print('Plotting historical contribution of reduction of traded emissions in total reduction of emissions %')
@@ -290,7 +296,7 @@ def compute_historic_distance(X):
     dist = []
     for i, y in enumerate(range(1995, 2019)):
         # print(y)
-        dist.append(1 - pdist([X[i].value, X[i].new], metric='correlation'))
+        dist.append(1 - pdist([X[i].value, X[i].new], metric='correlation')[0])
     return dist
 
 
@@ -378,33 +384,107 @@ ax.set_title('Global Sustainability Index'
 ax.tick_params(axis='y', labelsize = 20)
 ax.margins(x=0)
 
-ax.hlines(y=one_bar,
-           xmin=1995,
-           xmax=2018,
-           lw=3,
-           ls = '--',
-           color = color)
-
-ax.annotate(1,
-             xy=(1995, one_bar),
-             xytext=(-50,-5),
-            fontsize = 20,
-             textcoords='offset points',color=color)
-
-ax.annotate("Sustainable organization of trade\n with a $100 carbon tax",
-            xy=(2009, one_bar), xycoords='data',
-            xytext=(2009-2.5, one_bar-0.0004),
-            textcoords='data',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3",color= 'black'),
-            bbox=dict(boxstyle="round", fc="w")
-            )
+# ax.hlines(y=one_bar,
+#            xmin=1995,
+#            xmax=2018,
+#            lw=3,
+#            ls = '--',
+#            color = color)
+#
+# ax.annotate(1,
+#              xy=(1995, one_bar),
+#              xytext=(-50,-5),
+#             fontsize = 20,
+#              textcoords='offset points',color=color)
+#
+# ax.annotate("Sustainable organization of trade\n with a $100 carbon tax",
+#             xy=(2009, one_bar), xycoords='data',
+#             xytext=(2009-2.5, one_bar-0.0004),
+#             textcoords='data',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3",color= 'black'),
+#             bbox=dict(boxstyle="round", fc="w")
+#             )
 
 ax.grid(axis='x')
 
-ax.set_yticks([0.9960, 0.9965, 0.9970, 0.9975, 0.99775])
-ax.set_yticklabels(['0.9960', '0.9965', '0.9970', '0.9975', ''])
+# ax.set_yticks([0.9960, 0.9965, 0.9970, 0.9975, 0.99775])
+# ax.set_yticklabels(['0.9960', '0.9965', '0.9970', '0.9975', ''])
+
+plt.tight_layout()
+
+plt.show()
+# SAve for KIS
+plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.eps',format='eps')
+keep = {'year': years, 'GSI': dist}
+df = pd.DataFrame(data=keep)
+df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.csv')
+
+#%% China share
+country = 'CHN'
+
+
+hat = []
+all = []
+
+for y in range(1995,2019):
+    print(y)
+
+    hat.append(
+        traded[y].groupby(level=0).sum().loc[country, 'new'] / traded[y].groupby(level=0).sum().loc[country, 'value']
+    - 1)
+    all.append(
+        traded[y].sum().new / traded[y].sum().value
+        - 1)
+
+color = sns.color_palette()[3]
+
+fig, ax = plt.subplots(figsize=(12,8))
+
+ax.plot(years,hat,lw=4,color=color)
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                   , rotation=45
+                   , ha='right'
+                   , rotation_mode='anchor'
+                   ,fontsize=19)
+ax.set_title(country
+              ,color=color
+              ,fontsize=28
+              ,pad=15
+              )
+ax.tick_params(axis='y', labelsize = 20)
+ax.margins(x=0)
+
+ax.grid(axis='x')
+
+
+plt.tight_layout()
+
+plt.show()
+
+color = sns.color_palette()[0]
+
+fig, ax = plt.subplots(figsize=(12,8))
+
+ax.plot(years,all,lw=4,color=color)
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                   , rotation=45
+                   , ha='right'
+                   , rotation_mode='anchor'
+                   ,fontsize=19)
+ax.set_title('Total trade volumes'
+              ,color=color
+              ,fontsize=28
+              ,pad=15
+              )
+ax.tick_params(axis='y', labelsize = 20)
+ax.margins(x=0)
+
+ax.grid(axis='x')
+
 
 plt.tight_layout()
 
