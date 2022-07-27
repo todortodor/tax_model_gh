@@ -1329,6 +1329,7 @@ own_trade = own_trade.merge(imports.reset_index(),suffixes = ['','_total_exchang
 own_trade['value_self'] = own_trade.value / own_trade.value_total_exchange
 own_trade['new_self'] = own_trade.new / own_trade.new_total_exchange
 own_trade['value_connect'] = 1 - own_trade.value_self
+own_trade['value_connect_pc'] = (1 - own_trade.value_self)*100
 own_trade['new_connect'] = 1 - own_trade.new_self
 own_trade['change_connect'] = (own_trade['new_connect'] / own_trade['value_connect'] -1)*100
 own_trade.set_index('country' , inplace=True)
@@ -1347,8 +1348,10 @@ own_trade.loc['RUS','Continent'] = 'Asia'
 own_trade.loc['SAU','Continent'] = 'Africa'
 own_trade.loc['GRC','labor'] = own_trade.loc['GRC','labor']*0.5
 
-#%% Connectivity as a function of CO2 intensity
+#%% Connectivity as a function of CO2 intensity / self-connectivity
 variable = 'change_connect'
+# indep_var = 'co2_intensity'
+indep_var = 'value_connect_pc'
 
 print('Plotting connectivity as a function of CO2 intensity')
 
@@ -1365,10 +1368,10 @@ colors[country_list.index('RUS')] = (149/255, 143/255, 121/255)
 
 fig, ax = plt.subplots(figsize=(12,8),constrained_layout = True)
 
-ax.scatter(own_trade['co2_intensity'] , own_trade[variable],lw=3,s=50,marker='x',c=colors)
+ax.scatter(own_trade[indep_var] , own_trade[variable],lw=3,s=50,marker='x',c=colors)
 
 sns.kdeplot(data=own_trade,
-                x='co2_intensity',
+                x=indep_var,
                 y=variable,
                 hue = 'Continent',
                 fill = True,
@@ -1376,7 +1379,7 @@ sns.kdeplot(data=own_trade,
                 # height=10,
                 # ratio=5,
                 # bw_adjust=0.7,
-                # weights = 'labor',
+                weights = 'labor',
                 # legend=False,
                 levels = 2,
                 palette = palette,
@@ -1392,13 +1395,14 @@ sns.kdeplot(data=own_trade,
 
 sns.move_legend(ax,'lower right')
 
-coeffs_fit = np.polyfit(own_trade['co2_intensity'],
+coeffs_fit = np.polyfit(own_trade[indep_var],
                   own_trade[variable],
                   deg = 1,
                   # w=own_trade.labor
                   )
 
-x_lims = (0,900)
+# x_lims = (0,900)
+x_lims = (0,50)
 # y_lims = (-0.0025*200,0.0025*200)
 ax.set_xlim(*x_lims)
 y_lims = (-6,6)
@@ -1411,13 +1415,14 @@ ax.plot(x_vals, y_vals, '-',lw=2,color='k',label='Regression line')
 
 ax.hlines(y=0,xmin=x_lims[0],xmax=x_lims[1],ls='--',lw=1,color='k')
 
-ax.set_xlabel('CO2 intensity of production (Ton CO2 / $Mio.)',fontsize = 20)
+# ax.set_xlabel('CO2 intensity of production (Ton CO2 / $Mio.)',fontsize = 20)
+ax.set_xlabel('Connectivity to global trade(%)',fontsize = 20)
 ax.set_ylabel('Change in export share (%)',fontsize = 20)
 
 # plt.legend(loc='lower right')
 # ax.legend(loc='lower right')
 
-texts = [plt.text(own_trade['co2_intensity'].loc[country],  own_trade[variable].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
+texts = [plt.text(own_trade[indep_var].loc[country],  own_trade[variable].loc[country], country,size=15,color=colors[i]) for i,country in enumerate(country_list)]
 adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
 # adjust_text(texts, precision=0.001,
 #         expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),

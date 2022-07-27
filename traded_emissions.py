@@ -23,9 +23,9 @@ sns.set_style('whitegrid')
 
 fixed_carb_tax = True # if True, will load historical data for a given carbon cost
 carb_cost = 1e-4
-adjust = False  # if True, will adjust for dollar according to US inflation
+adjust = True  # if True, will adjust for dollar according to US inflation
 
-emissions_target = False  # if True, will load historical data for a given emissions target
+emissions_target = True  # if True, will load historical data for a given emissions target
 reduction_target = 0.7  # emissions target in proportion of baseline emissions
 
 if fixed_carb_tax:
@@ -256,7 +256,8 @@ ax.set_xticklabels(years
                    ,fontsize=19)
 ax.legend()
 
-plt.show()# SAve for KIS
+plt.show()
+# SAve for KIS
 plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_em.eps',format='eps')
 keep = {'year': years, 'Baseline': share_value, 'Counterfactual': share_new}
 df = pd.DataFrame(data=keep)
@@ -367,7 +368,7 @@ color = sns.color_palette()[2]
 fig, ax = plt.subplots(figsize=(12,8))
 
 dist = c_s_c
-one_bar = 0.99775
+one_bar = 0.9984
 
 ax.plot(years,dist,lw=4,color=color)
 ax.set_xticks(years)
@@ -384,28 +385,28 @@ ax.set_title('Global Sustainability Index'
 ax.tick_params(axis='y', labelsize = 20)
 ax.margins(x=0)
 
-# ax.hlines(y=one_bar,
-#            xmin=1995,
-#            xmax=2018,
-#            lw=3,
-#            ls = '--',
-#            color = color)
-#
-# ax.annotate(1,
-#              xy=(1995, one_bar),
-#              xytext=(-50,-5),
-#             fontsize = 20,
-#              textcoords='offset points',color=color)
-#
-# ax.annotate("Sustainable organization of trade\n with a $100 carbon tax",
-#             xy=(2009, one_bar), xycoords='data',
-#             xytext=(2009-2.5, one_bar-0.0004),
-#             textcoords='data',
-#             va='center',
-#             arrowprops=dict(arrowstyle="->",
-#                             connectionstyle="arc3",color= 'black'),
-#             bbox=dict(boxstyle="round", fc="w")
-#             )
+ax.hlines(y=one_bar,
+           xmin=1995,
+           xmax=2018,
+           lw=3,
+           ls = '--',
+           color = color)
+
+ax.annotate(1,
+             xy=(1995, one_bar),
+             xytext=(-50,-5),
+            fontsize = 20,
+             textcoords='offset points',color=color)
+
+ax.annotate("Sustainable organization of trade\n with a $100 carbon tax",
+            xy=(2009, one_bar), xycoords='data',
+            xytext=(2009-2.5, one_bar-0.0004),
+            textcoords='data',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3",color= 'black'),
+            bbox=dict(boxstyle="round", fc="w")
+            )
 
 ax.grid(axis='x')
 
@@ -416,10 +417,10 @@ plt.tight_layout()
 
 plt.show()
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.eps',format='eps')
-keep = {'year': years, 'GSI': dist}
-df = pd.DataFrame(data=keep)
-df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.eps',format='eps')
+# keep = {'year': years, 'GSI': dist}
+# df = pd.DataFrame(data=keep)
+# df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/GSI.csv')
 
 #%% China share
 country = 'CHN'
@@ -488,4 +489,79 @@ ax.grid(axis='x')
 
 plt.tight_layout()
 
+plt.show()
+
+# %% GSI excluding a sector
+sector_list = tot[y].index.get_level_values(level=1).drop_duplicates().to_list()
+years = [y for y in range(1995, 2019)]
+
+sector_dist = {}
+for s in sector_list:
+    print(s)
+    sector_dist[s] = compute_historic_distance([tot[y].groupby(level=[1]).sum().drop(s) for y in years])
+    # print(sector_dist[s])
+
+#%%
+sector_map = pd.read_csv('data/industry_labels_after_agg_expl.csv', sep=';')
+sector_map['ind_code'] = sector_map['ind_code'].str.replace('D','')
+sector_map.set_index('ind_code', inplace=True)
+
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
+
+for s in sector_list:
+    ax.plot(years,sector_dist[s], label =sector_map.loc[s].industry)
+# ax.legend()
+# ax.set_yscale('log')
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                    , rotation=45
+                    , ha='right'
+                    , rotation_mode='anchor'
+                    ,fontsize=19)
+ax.margins(x=0.03)
+
+ax.set_title('Leave-out sectoral GSI',fontsize = 20)
+
+labelLines(plt.gca().get_lines(),zorder=2.5,fontsize=15)
+plt.show()
+
+#%%
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
+
+for s in sector_list:
+    ax.plot(years,np.array(sector_dist[s]).squeeze()/np.array(sectors).squeeze(), label =sector_map.loc[s].industry)
+# ax.legend()
+# ax.set_yscale('log')
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                    , rotation=45
+                    , ha='right'
+                    , rotation_mode='anchor'
+                    ,fontsize=19)
+ax.margins(x=0.03)
+
+ax.set_title('Leave-out sectoral GSI',fontsize = 20)
+
+labelLines(plt.gca().get_lines(),zorder=2.5,fontsize=15)
+plt.show()
+
+
+#%%
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
+
+for s in sector_list:
+    ax.plot(years,np.array(sector_dist[s]).squeeze()/np.array(sector_dist[s]).squeeze().mean()/np.array(sectors).squeeze(), label =sector_map.loc[s].industry)
+# ax.legend()
+# ax.set_yscale('log')
+ax.set_xticks(years)
+ax.set_xticklabels(years
+                    , rotation=45
+                    , ha='right'
+                    , rotation_mode='anchor'
+                    ,fontsize=19)
+ax.margins(x=0.03)
+
+ax.set_title('Leave-out sectoral GSI',fontsize = 20)
+
+labelLines(plt.gca().get_lines(),zorder=2.5,fontsize=15)
 plt.show()

@@ -450,7 +450,13 @@ iot_traded_unit['value'] = 1
 iot_traded_unit.loc[iot_traded_unit['row_country'] == iot_traded_unit['col_country'] , ['value','new']] = 0
 iot_traded_unit_np = iot_traded_unit.value.to_numpy()
 
+# Load population data
+print('Loading labor data')
 
+labor = pd.read_csv('data/World bank/labor_force/labor.csv')
+labor.set_index('country', inplace=True)
+labor.sort_index(inplace=True)
+labor_year = labor[year]
 
 traded_new = []
 traded_share_new = []
@@ -462,9 +468,11 @@ gdp = []
 # dist = []
 countries = country_list
 price_index_l = {}
+price_index_adj_l = {}
 
 for country in countries:
     price_index_l[country] = []
+    price_index_adj_l[country] = []
 
 carb_cost_l = np.linspace(0, 1e-3, 101)
 
@@ -491,8 +499,30 @@ for carb_cost in tqdm(carb_cost_l):
     gdp.append(va.value.sum())
     utility.append(utility_countries.new.mean())
 
+    # Construct local wage and wage change
+    wage = va.groupby(level=0).sum().reset_index()
+    wage = wage.merge(
+        labor_year.reset_index(),
+        'left',
+        left_on='col_country',
+        right_on='country'
+    )
+    wage['value'] = wage['value'] / wage['2018'] * 1e6
+    wage['new'] = wage['new'] / wage['2018'] * 1e6
+    wage['hat'] = wage['new'] / wage['value']
+
+    wage.drop(['country', '2018'], axis=1, inplace=True)
+
+    # Add consumer price index and adjust by change in local wage
+    wage['price_index'] = price_index
+    wage['price_index_adj'] = wage['price_index'] / wage['hat']
+
+    wage.set_index('col_country', inplace=True)
+    price_index_adj = np.array(wage.price_index_adj)
+
     for country in countries:
         price_index_l[country].append(price_index[country_list.index(country)])
+        price_index_adj_l[country].append(price_index_adj[country_list.index(country)])
 
 #%% Plot
 
@@ -860,46 +890,53 @@ plt.show()
 
 print('Plotting consumer price index changes for multiple countries')
 
-# countries = ['DEU','CHN','USA','CHE']#,'FRA','CHE','CZE']
-countries = country_list
-# countries_to_label = ['DEU','CHN','USA','CHE']
-countries_to_label = country_list
+countries = ['DEU','CHN','USA','CHE']#,'FRA','CHE','CZE']
+# countries = country_list
+countries_to_label = ['DEU','CHN','USA','CHE']
+# countries_to_label = country_list
+
 
 infl = {}
-infl['DEU'] = 5.1
-infl['CHN'] = 0.9
-infl['USA'] = 7.9
-infl['CHE'] = 2.2
+# infl['DEU'] = 5.1
+# infl['CHN'] = 0.9
+# infl['USA'] = 7.9
+# infl['CHE'] = 2.2
 # infl['AUS'] = 5 #not true, was just to plot
+# June 2022 update
+infl['DEU'] = 7.6
+infl['CHN'] = 2.5
+infl['USA'] = 8.6
+infl['CHE'] = 3.4
 
-inf_l = [5.1,0.9,7.9,2.2]
+
+inf_l = [7.6,2.5,8.6,3.4]
 carb_tax_eq_l = []
-plot_inflation = False
+plot_inflation = True
 
 if plot_inflation:
     for i,country in enumerate(countries):
-        carb_tax_eq_l.append(carb_cost_l[np.argmin(np.abs((np.array(price_index_l[country])-1)*100-infl[country]))])
+        carb_tax_eq_l.append(carb_cost_l[np.argmin(np.abs((np.array(price_index_adj_l[country])-1)*100-infl[country]))])
 
 fig, ax1 = plt.subplots(figsize=(12,8))
 color = 'tab:blue'
 
 ax1.set_xlabel('Carbon tax (dollar / ton of CO2)',size = 30)
 ax1.set_xlim(0,1000)
-# ax1.set_ylim(0,25)
+ax1.set_ylim(0,40)
 ax1.tick_params(axis='x', labelsize = 20)
 
 ax1.set_ylabel('Consumer price index change (%)',size = 28)
 for i,country in enumerate(countries):
     color=sns.color_palette()[i%10]
     if country in countries_to_label:
-        ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_l[country])-1)*100,lw=2,label=country,color=color)
+        ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_adj_l[country])-1)*100,lw=2,label=country,color=color)
     # else:
     #     ax1.plot(np.array(carb_cost_l)*1e6,(np.array(price_index_l[country])-1)*100,lw=2,color=color)
     # carb_tax_eq = carb_cost_l[np.argmin(np.abs((np.array(price_index_l[country])-1)*100-infl[country]))]
     # ax1.scatter(carb_tax_eq*1e6,infl[country],lw=2,zorder=10)
 if plot_inflation:
-    ax1.scatter(np.array(carb_tax_eq_l)*1e6,np.array(inf_l),lw=4,zorder=10,c=sns.color_palette()[0:len(countries)],label='Inflation Feb22')
-    ax1.set_yticks([y for y in np.linspace(0, 25, 11)])
+    ax1.scatter(np.array(carb_tax_eq_l)*1e6,np.array(inf_l),lw=4,zorder=10,c=sns.color_palette()[0:len(countries)],label='Inflation Jun22')
+    # ax1.set_yticks([y for y in np.linspace(0, 25, 11)])
     ax1.legend()
 ax1.set_xticks([x for x in np.linspace(0,1000,11)])
 
@@ -2572,7 +2609,7 @@ fixed_carb_tax = True #if True, will load historical data for a given carbon cos
 carb_cost = 1e-4
 adjust = True #if True, will adjust for dollar according to US inflation
 
-emissions_target = True #if True, will load historical data for a given emissions target
+emissions_target = False #if True, will load historical data for a given emissions target
 reduction_target = 0.7 # emissions target in proportion of baseline emissions
 
 if fixed_carb_tax:
@@ -2805,7 +2842,7 @@ fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
 lw = 2
 
 ax.plot(years,country_to_country_dist,label='Geographical GSI\n(Exporter x Importer)',lw=lw)
-ax.plot(years,c_s_c,label='GSI',lw=lw)
+# ax.plot(years,c_s_c,label='GSI',lw=lw)
 # ax.set_yticks([])
 ax.set_xticks(years)
 ax.set_xticklabels(years

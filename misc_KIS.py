@@ -88,7 +88,7 @@ price_agg_change = (price_index * sh['cons_tot_np'] / sh['cons_tot_np'].sum()).s
 print('Aggregate price index change - Weighted average:',
       price_agg_change)
 
-# %% Relative sectoral prices in a given country : adjust by local wage
+# %% Relative sectoral prices in a given country : adjust by local wage - FIG 5
 country = 'CHE'
 print('Plotting sectoral price indices for country ' + country)
 
@@ -187,7 +187,7 @@ keep = sector_map.copy()
 keep['price_change'] = ((price_agg_adj[:, country_list.index(country)] - 1) * 100).tolist()
 keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.csv')
 
-# %% Scatter plot of gross ouput change with kernel density by coarse industry
+# %% Scatter plot of gross ouput change with kernel density by coarse industry - FIG 6
 
 print(
     'Plotting scatter plot of output changes for every country x sector according to production intensity with kernel density estimates for categories of sectors')
@@ -246,13 +246,13 @@ for data_no_z_i in [data_no_z_1, data_no_z_2]:
                         # height=10,
                         # ratio=5,
                         # bw_adjust=0.5,
-                        # weights = 'output',
+                        weights = 'output',
                         legend=False,
                         levels=2,
                         palette=palette,
                         common_norm=False,
                         # shade=True,
-                        thresh=0.35,
+                        thresh=0.2,
                         # fill = False,
                         # alpha=0.6,
                         # hue_order = data.group_label.drop_duplicates().to_list()[::-1],
@@ -285,95 +285,95 @@ ax.xaxis.set_major_formatter(ScalarFormatter())
 
 ax.hlines(0, xmin=sh['co2_intensity_np'].min(), xmax=1e5, colors='black', ls='--', lw=1)
 
-sec = '20'
-sector = sector_map.loc['D' + sec].industry
-sector_index = sector_list.index(sec)
-
-country = 'RUS'
-country_index = country_list.index(country)
-
-ax.annotate(country + ' - ' + sector,
-            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-            xycoords='data',
-            xytext=(-200, -5),
-            textcoords='offset points',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3", color='black'),
-            bbox=dict(boxstyle="round", fc="w"), zorder=10
-            )
-
-sec = '28'
-sector = sector_map.loc['D' + sec].industry
-sector_index = sector_list.index(sec)
-
-country = 'CHN'
-country_index = country_list.index(country)
-
-ax.annotate(country + ' - ' + sector,
-            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-            xycoords='data',
-            xytext=(-150, -100),
-            textcoords='offset points',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3", color='black'),
-            bbox=dict(boxstyle="round", fc="w"), zorder=10
-            )
-
-sec = '35'
-sector = sector_map.loc['D' + sec].industry
-sector_index = sector_list.index(sec)
-
-country = 'NOR'
-country_index = country_list.index(country)
-
-ax.annotate(country + ' - ' + sector,
-            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-            xycoords='data',
-            xytext=(120, 60),
-            textcoords='offset points',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3", color='black'),
-            bbox=dict(boxstyle="round", fc="w"), zorder=10
-            )
-
-sec = '50'
-sector = sector_map.loc['D' + sec].industry
-sector_index = sector_list.index(sec)
-
-country = 'DEU'
-country_index = country_list.index(country)
-
-ax.annotate(country + ' - ' + sector,
-            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-            xycoords='data',
-            xytext=(80, 15),
-            textcoords='offset points',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3", color='black'),
-            bbox=dict(boxstyle="round", fc="w"), zorder=10
-            )
-
-sec = '01T02'
-sector = sector_map.loc['D' + sec].industry
-sector_index = sector_list.index(sec)
-
-country = 'BRA'
-country_index = country_list.index(country)
-
-ax.annotate(country + ' - ' + sector,
-            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
-            xycoords='data',
-            xytext=(-250, -5),
-            textcoords='offset points',
-            va='center',
-            arrowprops=dict(arrowstyle="->",
-                            connectionstyle="arc3", color='black'),
-            bbox=dict(boxstyle="round", fc="w"), zorder=10
-            )
+# sec = '20'
+# sector = sector_map.loc['D' + sec].industry
+# sector_index = sector_list.index(sec)
+#
+# country = 'RUS'
+# country_index = country_list.index(country)
+#
+# ax.annotate(country + ' - ' + sector,
+#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+#             xycoords='data',
+#             xytext=(-200, -5),
+#             textcoords='offset points',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3", color='black'),
+#             bbox=dict(boxstyle="round", fc="w"), zorder=10
+#             )
+#
+# sec = '28'
+# sector = sector_map.loc['D' + sec].industry
+# sector_index = sector_list.index(sec)
+#
+# country = 'CHN'
+# country_index = country_list.index(country)
+#
+# ax.annotate(country + ' - ' + sector,
+#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+#             xycoords='data',
+#             xytext=(-150, -100),
+#             textcoords='offset points',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3", color='black'),
+#             bbox=dict(boxstyle="round", fc="w"), zorder=10
+#             )
+#
+# sec = '35'
+# sector = sector_map.loc['D' + sec].industry
+# sector_index = sector_list.index(sec)
+#
+# country = 'NOR'
+# country_index = country_list.index(country)
+#
+# ax.annotate(country + ' - ' + sector,
+#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+#             xycoords='data',
+#             xytext=(120, 60),
+#             textcoords='offset points',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3", color='black'),
+#             bbox=dict(boxstyle="round", fc="w"), zorder=10
+#             )
+#
+# sec = '50'
+# sector = sector_map.loc['D' + sec].industry
+# sector_index = sector_list.index(sec)
+#
+# country = 'DEU'
+# country_index = country_list.index(country)
+#
+# ax.annotate(country + ' - ' + sector,
+#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+#             xycoords='data',
+#             xytext=(80, 15),
+#             textcoords='offset points',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3", color='black'),
+#             bbox=dict(boxstyle="round", fc="w"), zorder=10
+#             )
+#
+# sec = '01T02'
+# sector = sector_map.loc['D' + sec].industry
+# sector_index = sector_list.index(sec)
+#
+# country = 'BRA'
+# country_index = country_list.index(country)
+#
+# ax.annotate(country + ' - ' + sector,
+#             xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+#             xycoords='data',
+#             xytext=(-250, -5),
+#             textcoords='offset points',
+#             va='center',
+#             arrowprops=dict(arrowstyle="->",
+#                             connectionstyle="arc3", color='black'),
+#             bbox=dict(boxstyle="round", fc="w"), zorder=10
+#             )
 
 # sec = '01T02'
 # sector = sector_map.loc['D' + sec].industry
@@ -395,12 +395,12 @@ ax.annotate(country + ' - ' + sector,
 
 plt.show()
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.eps',format='eps')
-keep = data_no_z.copy().drop('output', axis=1).rename(columns={'value':'change'})
-add = sector_map[['industry']].copy()
-add.index.names = ['sector']
-keep = keep.join(add, how='left')
-keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.eps',format='eps')
+# keep = data_no_z.copy().drop('output', axis=1).rename(columns={'value':'change'})
+# add = sector_map[['industry']].copy()
+# add.index.names = ['sector']
+# keep = keep.join(add, how='left')
+# keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/output_scatter.csv')
 
 # %% Labor transfers
 
@@ -730,7 +730,7 @@ ax.bar_label(ax.containers[0],
 
 plt.show()
 
-# %% Reallocation of labor, percentage changes
+# %% Reallocation of labor, percentage changes - FIG 9
 
 print('Plotting workforce reallocation in percentages')
 
@@ -795,7 +795,7 @@ keep = country_df[['realloc_percent']].copy()
 keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.csv')
 
 
-# %% Reallocation with constant prices
+# %% Reallocation with constant prices - REAL OUTPUT PLOTS
 
 # %% Calculate total output as q_hat * cons_b + m_hat * iot_b`
 # Compute _hat_sol (real changes)
@@ -960,7 +960,7 @@ ax.set_ylim(min_lim-0.3,max_lim+0.3)
 
 plt.show()
 
-#%% Production reallocation, % changes
+#%% Production reallocation, % changes - FIG 7
 
 print('Plotting production reallocation in percentages')
 
@@ -1170,7 +1170,7 @@ ax.set_ylim(min_lim-0.3,max_lim+0.1)
 
 plt.show()
 
-#%% Reallocation of production, percentage changes
+#%% Reallocation of production, percentage changes - FIG 8
 
 print('Plotting production reallocation in percentages')
 
@@ -1734,7 +1734,7 @@ gdp.loc['SAU','Continent'] = 'Africa'
 gdp.loc['CAN','labor'] = gdp.loc['CAN','labor']*6
 gdp.loc['MEX','labor'] = gdp.loc['MEX','labor']*2
 
-#%% Plot
+#%% Plot - FIG 10
 print('Plotting inequalities')
 
 palette = sns.color_palette()[0:5][::-1]
