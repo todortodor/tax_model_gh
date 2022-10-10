@@ -182,10 +182,10 @@ plt.tight_layout()
 
 plt.show()
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.eps',format='eps')
-keep = sector_map.copy()
-keep['price_change'] = ((price_agg_adj[:, country_list.index(country)] - 1) * 100).tolist()
-keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.eps',format='eps')
+# keep = sector_map.copy()
+# keep['price_change'] = ((price_agg_adj[:, country_list.index(country)] - 1) * 100).tolist()
+# keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/prices_CHE.csv')
 
 # %% Scatter plot of gross ouput change with kernel density by coarse industry - FIG 6
 
@@ -671,6 +671,9 @@ country_df['realloc'] = country_df['realloc_pos']
 
 country_df['realloc_percent'] = (country_df['realloc'] / country_df['labor']) * 100
 
+income_rank = pd.read_csv('data/World bank/country_income_rank.csv',sep=';',index_col=0)
+country_df = country_df.join(income_rank)
+
 # %% Reallocation of production, nominal differences
 
 print('Plotting production reallocation in nominal differences')
@@ -736,18 +739,18 @@ print('Plotting workforce reallocation in percentages')
 
 country_df.sort_values('realloc_percent', inplace=True)
 
-fig, ax = plt.subplots(figsize=(18, 10), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(16, 10), constrained_layout=True)
 
-# palette = [sns.color_palette()[i] for i in [2,4,0,3,1,7]]
-# colors = [palette[ind-1] for ind in country_dist_df.group_code]
+palette = [sns.color_palette()[i] for i in [3,0,2]]
+colors = [palette[ind] for ind in country_df.income_code]
 
-# ax1=ax.twinx()
+ax1=ax.twinx()
 
 ax.bar(country_df.index.get_level_values(0)
        , country_df.realloc_percent
        # ,bottom = country_dist_df.realloc_neg
-       , label='Net reallocation (%)',
-       # color=colors
+       # , label='Net reallocation (%)'
+       , color=colors
        )
 
 ax.set_xticklabels(['']
@@ -760,19 +763,23 @@ ax.set_xticklabels(['']
 ax.tick_params(axis='y', labelsize=20)
 ax.margins(x=0.01)
 ax.set_ylabel('% of national labor force',
-              fontsize=20)
+              fontsize=25)
 
-# handles = []
-# for ind in indicators_sorted:
-# handles = [mpatches.Patch(color=palette[ind], label=country_dist_df.group_label.drop_duplicates().to_list()[ind]) for ind,group in enumerate(country_dist_df.group_code.drop_duplicates().to_list())]
-# legend = ax1.legend(handles=handles,
-#           fontsize=20,
-#           # title='Greensourcing possibility',
-#           loc='lower right')
-# ax1.grid(visible=False)
+handles = []
+# for ind in country_df.income_code.drop_duplicates().to_list():
+handles = [mpatches.Patch(color=palette[ind], 
+                          label=country_df[country_df.income_code == ind].income_label.drop_duplicates().to_list()[0]
+                          ) 
+           for ind in country_df.income_code.drop_duplicates().to_list()]
+legend = ax1.legend(handles=handles,
+          fontsize=20,
+          # title='Greensourcing possibility',
+           loc='upper left'
+          )
+ax1.grid(visible=False)
+ax1.set_yticks([])
 
-
-leg = ax.legend(fontsize=20, loc='upper left')
+# leg = ax.legend(fontsize=20, loc='upper left')
 # leg.legendHandles[0].set_color('grey')
 # leg.legendHandles[1].set_color('grey')
 
@@ -785,14 +792,14 @@ ax.bar_label(ax.containers[0],
              labels=country_df.index.get_level_values(0),
              rotation=90,
              label_type='edge',
-             padding=2, zorder=10)
-
+             padding=3, zorder=10, fontsize=15)
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/within_country_disruption.eps',format='eps')
 plt.show()
 
 # # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.eps',format='eps')
-keep = country_df[['realloc_percent']].copy()
-keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.eps',format='eps')
+# keep = country_df[['realloc_percent']].copy()
+# keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/labor_realloc.csv')
 
 
 # %% Reallocation with constant prices - REAL OUTPUT PLOTS

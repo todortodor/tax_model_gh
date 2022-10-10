@@ -305,7 +305,7 @@ plt.show()
 # SAve for KIS
 plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/pricing.eps',format='eps')
 keep = carbon_prices.unstack(level=0).price
-df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/pricing.csv')
+keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/pricing.csv')
 
 
 fig, ax = plt.subplots(figsize=(12,8))
@@ -737,16 +737,16 @@ ax[1,1].set_xlim(0,1000)
 # # ax[1,0].set_yticklabels(['', '1.01', '1.02', '1.03'])
 
 plt.tight_layout()
-
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/macro_effects.eps',format='eps')
 plt.show()
 
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.eps',format='eps')
-keep = {'Tax': np.array(carb_cost_l)*1e6, 'Emissions': np.array(emissions)/1e3,
-        'GDP': np.array(gdp_new)/1e6, 'Welfare': utility, 'GDP_index': np.array(gdp_new)/gdp_new[0],
-        'Emissions_index': np.array(emissions)/emissions[0]}
-df = pd.DataFrame(data=keep)
-df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.eps',format='eps')
+# keep = {'Tax': np.array(carb_cost_l)*1e6, 'Emissions': np.array(emissions)/1e3,
+#         'GDP': np.array(gdp_new)/1e6, 'Welfare': utility, 'GDP_index': np.array(gdp_new)/gdp_new[0],
+#         'Emissions_index': np.array(emissions)/emissions[0]}
+# df = pd.DataFrame(data=keep)
+# df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/summary.csv')
 
 
 #%% Effect on output share traded
@@ -756,11 +756,11 @@ print('Plotting share of output traded')
 fig, ax1 = plt.subplots(figsize=(12,8))
 color = 'tab:blue'
 
-ax1.set_xlabel('Carbon tax (dollar / ton of CO2)',size = 30)
+ax1.set_xlabel('Carbon tax (dollar / ton of CO2)',size = 20)
 ax1.set_xlim(0,1000)
 ax1.tick_params(axis='x', labelsize = 20)
 
-ax1.set_ylabel('Share of output traded (%)', color=color,size = 30)
+ax1.set_ylabel('Share of output traded (%)', color=color,size = 20)
 ax1.plot(np.array(carb_cost_l)*1e6,np.array(traded_share_new)*100, color=color,lw=5)
 ax1.tick_params(axis='y', labelsize = 20)
 
@@ -795,13 +795,15 @@ ax1.set_ylim(12.9,13.6)
 # ax[1,0].set_yticklabels(['', '1.01', '1.02', '1.03'])
 
 plt.tight_layout
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/share_traded.eps',format='eps')
+
 plt.show()
 
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.eps',format='eps')
-keep = {'Tax': np.array(carb_cost_l)*1e6, 'share': np.array(traded_share_new)*100}
-df = pd.DataFrame(data=keep)
-df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.eps',format='eps')
+# keep = {'Tax': np.array(carb_cost_l)*1e6, 'share': np.array(traded_share_new)*100}
+# df = pd.DataFrame(data=keep)
+# df.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS2_plots/trade_share.csv')
 
 
 #%% Accounting for SCC
@@ -1216,7 +1218,7 @@ plt.show()
 
 print('Plotting scatter plot of output changes for every country x sector according to produciton intensity with kernel density estimates for categories of sectors')
 
-# p_hat_sol = sol_all[y].res.price_hat.to_numpy().reshape(C,S)
+p_hat_sol = sol_all[y].res.price_hat.to_numpy().reshape(C,S)
 E_hat_sol = sol_all[y].res.output_hat.to_numpy().reshape(C,S)
 q_hat_sol = E_hat_sol / p_hat_sol
 q_hat_sol_percent = (q_hat_sol-1)*100
@@ -1285,7 +1287,7 @@ for data_no_z_i in [data_no_z_1,data_no_z_2] :
         ax.scatter(data_no_z_i[data_no_z_i['group_code'] == group].co2_intensity,data_no_z_i[data_no_z_i['group_code'] == group].value,color=palette[i],s=10,zorder=1-i)
 
 ax.set_ylabel('Production changes (%)',
-                fontsize=30
+                fontsize=20
                 )
 ax.set_xscale('log')
 # ax.set_ylim(-100,+37.5)
@@ -1298,7 +1300,7 @@ ax.tick_params(axis='both', which='major', labelsize=20)
 
 
 ax.set_xlabel('Carbon intensity of production (Tons / Mio.$)',
-                fontsize=30)
+                fontsize=20)
 
 handles = [mpatches.Patch(color=palette[ind], label=group_labels_sorted[ind]) for ind,group in enumerate(group_labels_sorted)]
 ax.legend(handles=handles,fontsize=20, loc = 'lower left')
@@ -1307,6 +1309,115 @@ ax.xaxis.set_major_formatter(ScalarFormatter())
 
 ax.hlines(0,xmin=sh['co2_intensity_np'].min(),xmax=1e5,colors='black',ls='--',lw=1)
 
+sec = '20'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'RUS'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(-250, 0),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sec = '28'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'CHN'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(-150, -80),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sec = '35'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'NOR'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(20, 80),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sec = '50'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'DEU'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(80, 15),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sec = '01T02'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'BRA'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(-250, -5),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+sec = '01T02'
+sector = sector_map.loc['D' + sec].industry
+sector_index = sector_list.index(sec)
+
+country = 'CHE'
+country_index = country_list.index(country)
+
+ax.annotate(country + ' - ' + sector,
+            xy=(sh['co2_intensity_np'][country_index, sector_index], q_hat_sol_percent[country_index, sector_index]),
+            xycoords='data',
+            xytext=(100, -35),
+            textcoords='offset points',
+            va='center',
+            arrowprops=dict(arrowstyle="->",
+                            connectionstyle="arc3", color='black'),
+            bbox=dict(boxstyle="round", fc="w"), zorder=10
+            )
+
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/micro_effect.pdf',format='pdf')
 
 plt.show()
 
@@ -1520,8 +1631,8 @@ total_output_decrease_percent = (total_output_net_decrease/total_output)*100
 total_output_reallocated = np.abs(sector_dist_df.realloc).sum()
 total_output_reallocated_percent = (total_output_reallocated/total_output)*100
 
-ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross output\nwould be reallocated sector-wise for\na net reduction of output of '+str(total_output_decrease_percent.round(2))+'%',
-             xy=(27,-22.5),fontsize=25,zorder=10,backgroundcolor='w')
+# ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross output\nwould be reallocated sector-wise for\na net reduction of output of '+str(total_output_decrease_percent.round(2))+'%',
+#              xy=(27,-22.5),fontsize=25,zorder=10,backgroundcolor='w')
 
 ax.grid(axis='x')
 
@@ -1532,8 +1643,8 @@ ax.bar_label(ax.containers[1],
               padding=2,
               zorder=10)
 
-
 ax.set_ylim(-32,12)
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/cross_sector_effects.eps',format='eps')
 
 plt.show()
 
@@ -1722,8 +1833,10 @@ total_output_decrease_percent = (total_output_net_decrease/total_output)*100
 total_output_reallocated = np.abs(country_dist_df.realloc).sum()
 total_output_reallocated_percent = (total_output_reallocated/total_output)*100
 
-ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross output\nwould be reallocated country-wise for\na net reduction of output of '+str(total_output_decrease_percent.round(2))+'%',
-             xy=(41,-16),fontsize=25,zorder=10,backgroundcolor='w')
+# ax.annotate('Overall, '+str(total_output_reallocated_percent.round(2))+'% of gross output\nwould be reallocated country-wise for\na net reduction of output of '+str(total_output_decrease_percent.round(2))+'%',
+#              xy=(41,-16),fontsize=25,zorder=10,backgroundcolor='w')
+
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/cross_country_effects.eps',format='eps')
 
 plt.show()
 
@@ -2204,6 +2317,9 @@ gdp['utility_percent_change'] = (sol_all[y].utility.values-1)*100
 country_map = pd.read_csv('data/country_continent.csv',sep=';').set_index('country')
 gdp = gdp.join(country_map)
 
+income_rank = pd.read_csv('data/World bank/country_income_rank.csv',sep=';',index_col=0)
+gdp = gdp.join(income_rank)
+
 gdp.loc['TWN','Continent'] = 'Asia'
 gdp.loc['ROW','Continent'] = 'Africa'
 gdp.loc['AUS','Continent'] = 'Asia'
@@ -2214,7 +2330,7 @@ gdp.loc['SAU','Continent'] = 'Africa'
 gdp.loc['CAN','labor'] = gdp.loc['CAN','labor']*6
 gdp.loc['MEX','labor'] = gdp.loc['MEX','labor']*2
 
-#%% Plot
+#%% Plot by continents
 print('Plotting inequalities')
 
 palette = sns.color_palette()[0:5][::-1]
@@ -2278,9 +2394,78 @@ adjust_text(texts, precision=0.001,
 
 plt.show()
 # SAve for KIS
-plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.eps',format='eps')
-keep = gdp[['per_capita', 'utility_percent_change', 'Continent']]
-keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.csv')
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.eps',format='eps')
+# keep = gdp[['per_capita', 'utility_percent_change', 'Continent']]
+# keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.csv')
+
+#%% Plot by income group
+print('Plotting inequalities')
+
+# palette = sns.color_palette()[0:5][::-1]
+palette = [sns.color_palette()[i] for i in [0,2,3]]
+income_colors = {
+    'Low-income' : palette[2],
+    'Middle-income' : palette[0],
+    'High-income' : palette[1],
+                    }
+colors = [income_colors[gdp.loc[country,'income_label']] for country in country_list]
+
+fig, ax = plt.subplots(figsize=(12,8),constrained_layout = True)
+
+ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50,c = colors)     # For kernel density
+# ax.scatter(gdp.per_capita,gdp.utility_percent_change,marker='x',lw=2,s=50)
+
+ax.set_xlabel('GDP per workforce (Thousands $)', fontsize = 20)
+ax.set_ylabel('Welfare change (%)', fontsize = 20)
+
+sns.kdeplot(data=gdp,
+                x='per_capita',
+                y="utility_percent_change",
+                hue = 'income_label',
+                fill = True,
+                alpha = 0.25,
+                # height=10,
+                # ratio=5,
+                # bw_adjust=0.7,
+                weights = 'labor',
+                # legend=False,
+                levels = 2,
+                palette = palette,
+                # common_norm = False,
+                shade=True,
+                thresh = 0.2,
+                # dropna=True,
+                # fill = False,
+                # alpha=0.6,
+                # hue_order = data.group_label.drop_duplicates().to_list()[::-1],
+                ax = ax
+                )
+
+# sns.move_legend(ax, "lower right")
+
+ax.set_xlim(0,175)
+# ax.set_ylim(-6.5,2.5)             # For kernel density
+ax.set_ylim(-7,1.5)
+
+
+texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15, c = colors[i]) for i,country in enumerate(country_list)]     # For kernel density
+# texts = [plt.text(gdp.per_capita.loc[country], gdp.utility_percent_change.loc[country], country,size=15) for i,country in enumerate(country_list)]
+
+# adjust_text(texts,arrowprops=dict(arrowstyle="-", color='k', lw=0.5))
+adjust_text(texts, precision=0.001,
+        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+        force_text=(0.01, 0.25), force_points=(0.01, 0.25),
+        arrowprops=dict(arrowstyle='-', color='k'#, alpha=.5
+                        ))
+
+plt.savefig('../tax_model/eps_figures_for_ralph_pres/welfare_changes.pdf',format='pdf')
+
+plt.show()
+# SAve for KIS
+# plt.savefig('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.eps',format='eps')
+# keep = gdp[['per_capita', 'utility_percent_change', 'Continent']]
+# keep.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Presentation/KIS1_plots/ineq.csv')
+
 
 #%% Correcting inequalities, the cost
 
