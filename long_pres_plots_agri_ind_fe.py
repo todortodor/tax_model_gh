@@ -2500,7 +2500,7 @@ fixed_carb_tax = True #if True, will load historical data for a given carbon cos
 carb_cost = 1e-4
 adjust = True #if True, will adjust for dollar according to US inflation
 
-emissions_target = True #if True, will load historical data for a given emissions target
+emissions_target = False #if True, will load historical data for a given emissions target
 reduction_target = 0.7 # emissions target in proportion of baseline emissions
 
 if fixed_carb_tax:
@@ -2730,9 +2730,9 @@ print('Plotting GSI and geographical GSI')
 
 fig, ax = plt.subplots(figsize=(12,8),constrained_layout=True)
 
-lw = 2
+lw = 4
 
-ax.plot(years,country_to_country_dist,label='Geographical GSI\n(Exporter x Importer)',lw=lw)
+# ax.plot(years,country_to_country_dist,label='Geographical GSI\n(Exporter x Importer)',lw=lw)
 ax.plot(years,c_s_c,label='GSI',lw=lw)
 # ax.set_yticks([])
 ax.set_xticks(years)
@@ -2742,7 +2742,10 @@ ax.set_xticklabels(years
                     , rotation_mode='anchor'
                     ,fontsize=20)
 
-ax.legend(fontsize=20)
+# ax.legend(fontsize=20)
+plt.title('Global Sustainability Index', fontsize = 20)
+plt.savefig('../tax_model/eps_figures_for_ralph_pres/GSI.eps', format='eps')
+
 plt.show()
 
 #%% emissions saved every year by a fixed carbon tax

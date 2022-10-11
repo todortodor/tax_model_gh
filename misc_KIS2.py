@@ -247,13 +247,13 @@ def network_create(data):
 
 # Write csv
 cons_network = network_create(cons_flows)
-cons_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/cons_network.csv')
+# cons_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/cons_network.csv')
 
 iot_network = network_create(iot_flows)
-iot_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/iot_network.csv')
+# iot_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/iot_network.csv')
 
 total_network = network_create(trade_flows)
-total_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/total_network.csv')
+# total_network.to_csv('/Users/malemo/Dropbox/UZH/Green Logistics/Global Sustainability Index/Carbon_tax_model/networks/Test_weights/total_network.csv')
 
 #%% Obtain mean value of change for maps
 # cons_flows['value'] = cons_flows['value_traded'] / (cons_flows['value_output'] * cons_flows['value_imports'])
@@ -1503,7 +1503,7 @@ print('Plotting change in sectoral share of output traded in percentages')
 sector_use = sector_dist_df.sort_values('diff_pc', ascending=True)
 
 
-fig, ax = plt.subplots(figsize=(18,10),constrained_layout = True)
+fig, ax = plt.subplots(figsize=(16,10),constrained_layout = True)
 
 # palette = [sns.color_palette()[i] for i in [2,4,0,3,1,7]]
 # colors = [palette[ind-1] for ind in sector_dist_df.group_code]
@@ -1542,6 +1542,8 @@ ax.bar_label(ax.containers[0],
 max_lim = sector_dist_df['diff_pc'].max()
 min_lim = sector_dist_df['diff_pc'].min()
 ax.set_ylim(min_lim-6,max_lim+5)
+
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/cross_sector_effects_trade.eps', format='eps')
 
 plt.show()
 
@@ -1839,12 +1841,12 @@ ax.set_ylim(min_lim-0.2,max_lim+0.2)
 
 plt.show()
 
-#%%
+#%%Plotting change in import/export share in percentages
 print('Plotting change in import/export share in percentages')
 
 country_dist_df.sort_values('diff_pc',inplace = True)
 
-fig, ax = plt.subplots(figsize=(18,10),constrained_layout = True)
+fig, ax = plt.subplots(figsize=(16,10),constrained_layout = True)
 
 ax.bar(country_dist_df.index.get_level_values(0)
             ,country_dist_df.diff_pc
@@ -1883,6 +1885,8 @@ ax.bar_label(ax.containers[0],
 max_lim = country_dist_df['diff_pc'].max()
 min_lim = country_dist_df['diff_pc'].min()
 ax.set_ylim(min_lim-1,max_lim+1)
+
+# plt.savefig('../tax_model/eps_figures_for_ralph_pres/cross_country_effects_trade.eps', format='eps')
 
 plt.show()
 
